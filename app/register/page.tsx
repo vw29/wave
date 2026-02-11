@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { registerUser } from "@/actions/register.actions";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { FieldDescription } from "@/components/ui/field";
 
 export default function Register() {
   const router = useRouter();
@@ -49,8 +50,8 @@ export default function Register() {
   }
 
   return (
-    <main className="flex justify-center items-center min-h-screen">
-      <Card className="w-87.5">
+    <main className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Register</CardTitle>
           <CardDescription>Register to create an account</CardDescription>
@@ -114,6 +115,9 @@ export default function Register() {
                   )}
                 />
                 <Button type="submit">Register</Button>
+                <FieldDescription className="text-center">
+                  Already have an account? <a href="#">Login</a>
+                </FieldDescription>
               </fieldset>
             </form>
           </Form>

@@ -28,4 +28,11 @@ export const registerSchema = z
     path: ["passwordConfirmation"],
   });
 
+
+export const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: passwordSchema,
+})
+
 export type RegisterSchema = z.infer<typeof registerSchema>;
+export type LoginSchema = z.infer<typeof loginSchema>;
