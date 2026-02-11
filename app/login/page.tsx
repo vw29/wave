@@ -26,11 +26,16 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { loginUser } from "@/actions/login.actions";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Page({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter();
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -39,7 +44,19 @@ export default function Page({
     },
   });
 
-  async function onSubmit(data: LoginSchema) {}
+  async function onSubmit(data: LoginSchema) {
+    const result = await loginUser(data);
+    if (!result.success) {
+      form.setError("email", { message: result.message });
+    }
+
+    if (result.success) {
+      toast.success("Login successful");
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
+    }
+  }
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -97,7 +114,8 @@ export default function Page({
                         Login with Google
                       </Button>
                       <FieldDescription className="text-center">
-                        Don&apos;t have an account? <a href="#">Sign up</a>
+                        Don&apos;t have an account?{" "}
+                        <Link href="/register">Sign up</Link>
                       </FieldDescription>
                     </FormItem>
                   </fieldset>

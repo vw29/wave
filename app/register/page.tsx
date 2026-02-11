@@ -25,6 +25,7 @@ import { registerUser } from "@/actions/register.actions";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { FieldDescription } from "@/components/ui/field";
+import Link from "next/link";
 
 export default function Register() {
   const router = useRouter();
@@ -116,7 +117,7 @@ export default function Register() {
                 />
                 <Button type="submit">Register</Button>
                 <FieldDescription className="text-center">
-                  Already have an account? <a href="#">Login</a>
+                  Already have an account? <Link href="/login">Login</Link>
                 </FieldDescription>
               </fieldset>
             </form>
