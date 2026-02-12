@@ -1,5 +1,6 @@
 "use server";
 
+import { signIn } from "@/auth";
 import prisma from "@/lib/prisma";
 import { loginSchema, LoginSchema } from "@/lib/schemas";
 import argon2 from "argon2";
@@ -35,6 +36,12 @@ export async function loginUser(data: LoginSchema) {
     if (!isPasswordValid) {
       return { success: false, message: "Email or password is incorrect" };
     }
+
+    await signIn("credentials", {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+    });
 
     return {
       success: true,
