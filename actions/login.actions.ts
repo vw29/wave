@@ -29,14 +29,6 @@ export async function loginUser(data: LoginSchema) {
       return { success: false, message: "Email or password is incorrect" };
     }
 
-    const isPasswordValid = await argon2.verify(
-      user.passwordHash,
-      data.password,
-    );
-    if (!isPasswordValid) {
-      return { success: false, message: "Email or password is incorrect" };
-    }
-
     await signIn("credentials", {
       email: data.email,
       password: data.password,

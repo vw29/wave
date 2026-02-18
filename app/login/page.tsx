@@ -9,12 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { loginSchema, LoginSchema } from "@/lib/schemas";
 import { useForm } from "react-hook-form";
@@ -96,7 +91,15 @@ export default function Page({
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FieldLabel htmlFor="password">Password</FieldLabel>
+                          <Field orientation="horizontal">
+                            <FieldLabel htmlFor="password">Password</FieldLabel>
+                            <Link
+                              href="#"
+                              className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                            >
+                              Forgot your password?
+                            </Link>
+                          </Field>
                           <FormControl>
                             <Input
                               {...field}
