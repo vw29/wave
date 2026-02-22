@@ -25,6 +25,7 @@ import { loginUser } from "@/actions/login.actions";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 export default function Page({
   className,
@@ -42,14 +43,12 @@ export default function Page({
   async function onSubmit(data: LoginSchema) {
     const result = await loginUser(data);
     if (!result.success) {
-      form.setError("email", { message: result.message });
+      form.setError("root", { message: result.message });
     }
 
     if (result.success) {
       toast.success("Login successful");
-      setTimeout(() => {
-        router.push("/");
-      }, 1500);
+      router.push("/");
     }
   }
 
@@ -79,7 +78,7 @@ export default function Page({
                             <Input
                               {...field}
                               type="email"
-                              placeholder="jhon.doe@example.com"
+                              placeholder="john.doe@example.com"
                             />
                           </FormControl>
                           <FormMessage />
@@ -105,6 +104,7 @@ export default function Page({
                               {...field}
                               type="password"
                               placeholder="********"
+                              autoComplete="current-password"
                             />
                           </FormControl>
                           <FormMessage />
@@ -112,7 +112,19 @@ export default function Page({
                       )}
                     />
                     <FormItem>
-                      <Button type="submit">Login</Button>
+                      <Button
+                        type="submit"
+                        disabled={form.formState.isSubmitting}
+                      >
+                        {form.formState.isSubmitting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Logging in...
+                          </>
+                        ) : (
+                          "Login"
+                        )}
+                      </Button>
                       <Button variant="outline" type="button">
                         Login with Google
                       </Button>

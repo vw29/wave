@@ -3,7 +3,7 @@ import { z } from "zod";
 export const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters long")
-  .max(20, "Password must be at most 20 characters long")
+  .max(30, "Password must be at most 30 characters long")
   .refine((v) => /[A-Z]/.test(v), {
     message: "Password must contain an uppercase letter",
   })
@@ -19,7 +19,7 @@ export const passwordSchema = z
 
 export const registerSchema = z
   .object({
-    email: z.string().email("Invalid email address"),
+    email: z.string().email("Invalid email address").trim().toLowerCase(),
     password: passwordSchema,
     passwordConfirmation: z.string(),
   })
@@ -28,11 +28,10 @@ export const registerSchema = z
     path: ["passwordConfirmation"],
   });
 
-
 export const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: passwordSchema,
-})
+  email: z.string().email("Invalid email address").trim().toLowerCase(),
+  password: z.string().min(1, "Password is required"),
+});
 
 export type RegisterSchema = z.infer<typeof registerSchema>;
 export type LoginSchema = z.infer<typeof loginSchema>;

@@ -3,14 +3,23 @@
 import { registerSchema, RegisterSchema } from "@/lib/schemas";
 import prisma from "@/lib/prisma";
 import argon2 from "argon2";
+import { checkRateLimit } from "@/lib/ratelimit";
 
 export async function registerUser(data: RegisterSchema) {
   const result = registerSchema.safeParse(data);
   if (!result.success) {
     return {
-      error: true,
+      success: false,
       message: result.error.issues[0]?.message ?? "Something went wrong",
     };
+  }
+  try {
+    await checkRateLimit(data.email, "register");
+  } catch (error) {
+    if (error instanceof Error && error.message === "RATE_LIMITED") {
+      return { success: false, message: "Too many requests" };
+    }
+    throw error;
   }
 
   const hashedPassword = await argon2.hash(data.password, {
@@ -33,10 +42,8 @@ export async function registerUser(data: RegisterSchema) {
   } catch (error: unknown) {
     const err = error as { code?: string; meta?: { target?: string[] } };
     if (err?.code === "P2002") {
-      return { error: true, message: "Email already exists" };
+      return { success: false, message: "Email already exists" };
     }
-    return { error: true, message: "Something went wrong" };
+    return { success: false, message: "Something went wrong" };
   }
 }
-
-//  Password for [jhon.doe@example.com] is [=timqMV]^4m7U9z]

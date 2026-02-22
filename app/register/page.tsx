@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
+import { Loader2 } from "lucide-react";
 import { registerSchema, RegisterSchema } from "@/lib/schemas";
 import {
   Form,
@@ -40,13 +40,13 @@ export default function Register() {
 
   async function onSubmit(data: RegisterSchema) {
     const result = await registerUser(data);
-    if (result?.error) {
+    if (!result?.success) {
       form.setError("email", { message: result?.message });
     }
 
     if (result?.success) {
       toast.success("Account created successfully");
-      setTimeout(() => router.push("/login"), 1500);
+      router.push("/login");
     }
   }
 
@@ -75,6 +75,7 @@ export default function Register() {
                           {...field}
                           type="email"
                           placeholder="john.doe@example.com"
+                          autoComplete="email"
                         />
                       </FormControl>
                       <FormMessage />
@@ -92,6 +93,7 @@ export default function Register() {
                           {...field}
                           type="password"
                           placeholder="********"
+                          autoComplete="new-password"
                         />
                       </FormControl>
                       <FormMessage />
@@ -109,13 +111,23 @@ export default function Register() {
                           {...field}
                           type="password"
                           placeholder="********"
+                          autoComplete="new-password"
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit">Register</Button>
+                <Button type="submit" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Registering...
+                    </>
+                  ) : (
+                    "Register"
+                  )}
+                </Button>
                 <FieldDescription className="text-center">
                   Already have an account? <Link href="/login">Login</Link>
                 </FieldDescription>
