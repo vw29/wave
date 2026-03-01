@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { loginSchema, LoginSchema } from "@/lib/schemas";
 import { useForm } from "react-hook-form";
@@ -21,11 +21,12 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { loginUser } from "@/actions/login.actions";
+import { loginUser } from "@/actions/auth/login";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import PasswordField from "@/components/PasswordField";
 
 export default function Page({
   className,
@@ -41,14 +42,17 @@ export default function Page({
   });
 
   async function onSubmit(data: LoginSchema) {
-    const result = await loginUser(data);
-    if (!result.success) {
-      form.setError("root", { message: result.message });
-    }
-
-    if (result.success) {
-      toast.success("Login successful");
-      router.push("/");
+    try {
+      form.clearErrors("root");
+      const result = await loginUser(data);
+      if (!result.success) {
+        form.setError("root", { message: result.message });
+      } else {
+        toast.success("Login successful");
+        router.push("/my-account");
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
     }
   }
 
@@ -89,28 +93,18 @@ export default function Page({
                       control={form.control}
                       name="password"
                       render={({ field }) => (
-                        <FormItem>
-                          <Field orientation="horizontal">
-                            <FieldLabel htmlFor="password">Password</FieldLabel>
-                            <Link
-                              href="#"
-                              className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                            >
-                              Forgot your password?
-                            </Link>
-                          </Field>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="password"
-                              placeholder="********"
-                              autoComplete="current-password"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
+                        <PasswordField
+                          label="Password"
+                          field={field}
+                          autoComplete="current-password"
+                        />
                       )}
                     />
+                    {form.formState.errors.root && (
+                      <p className="text-destructive text-sm text-center">
+                        {form.formState.errors.root.message}
+                      </p>
+                    )}
                     <FormItem>
                       <Button
                         type="submit"

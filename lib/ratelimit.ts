@@ -7,7 +7,7 @@ export const ratelimit = new Ratelimit({
   limiter: Ratelimit.slidingWindow(7, "60 s"),
 });
 
-export async function checkRateLimit(identifier: string | null,type:"login"|"register") {
+export async function checkRateLimit(identifier: string | null,type:"login"|"register"|"changePassword") {
   const headerList = await headers();
   const ip =
     headerList.get("x-forwarded-for")?.split(",")[0] ||

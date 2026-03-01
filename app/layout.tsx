@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
-import { auth } from "@/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,8 +23,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // clean up and remove the session & the related div after use
-  const session = await auth();
   return (
     <html lang="en">
       <body
@@ -33,9 +30,6 @@ export default async function RootLayout({
       >
         <Toaster position="top-center" />
         {children}
-        <div className="text-red-500 font-bold flex justify-center items-center h-10 w-full">
-          {session?.user?.email ? "Logged in" : "Not logged in"}
-        </div>
       </body>
     </html>
   );

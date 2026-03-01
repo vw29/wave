@@ -21,11 +21,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { registerUser } from "@/actions/register.actions";
+import { registerUser } from "@/actions/auth/register";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { FieldDescription } from "@/components/ui/field";
 import Link from "next/link";
+import PasswordField from "@/components/PasswordField";
 
 export default function Register() {
   const router = useRouter();
@@ -39,14 +40,17 @@ export default function Register() {
   });
 
   async function onSubmit(data: RegisterSchema) {
-    const result = await registerUser(data);
-    if (!result?.success) {
-      form.setError("email", { message: result?.message });
+    try {
+      form.clearErrors("root");
+      const result = await registerUser(data);
+      if (!result?.success) {
+        form.setError("root", { message: result?.message });
+      } else {
+        toast.success("Account created successfully");
+        router.push("/login");
     }
-
-    if (result?.success) {
-      toast.success("Account created successfully");
-      router.push("/login");
+    } catch (error) {
+      toast.error("Something went wrong");
     }
   }
 
@@ -86,38 +90,29 @@ export default function Register() {
                   control={form.control}
                   name="password"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="password"
-                          placeholder="********"
-                          autoComplete="new-password"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                    <PasswordField
+                      label="Password"
+                      field={field}
+                      autoComplete="new-password"
+                    />
                   )}
                 />
                 <FormField
                   control={form.control}
                   name="passwordConfirmation"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="password"
-                          placeholder="********"
-                          autoComplete="new-password"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                    <PasswordField
+                      label="Confirm Password"
+                      field={field}
+                      autoComplete="new-password"
+                    />
                   )}
                 />
+                {form.formState.errors.root && (
+                  <p className="text-destructive text-sm text-center">
+                    {form.formState.errors.root.message}
+                  </p>
+                )}
                 <Button type="submit" disabled={form.formState.isSubmitting}>
                   {form.formState.isSubmitting ? (
                     <>
