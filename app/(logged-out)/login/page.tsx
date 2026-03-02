@@ -97,7 +97,9 @@ export default function Page({
                           label="Password"
                           field={field}
                           autoComplete="current-password"
-                          href="forget-password"
+                          href={`/forget-password?email=${encodeURIComponent(
+                            form.getValues("email"),
+                          )}`}
                         />
                       )}
                     />

@@ -27,7 +27,14 @@ export async function changePassword(data: ChangePasswordSchema) {
     };
   }
 
-  checkRateLimit(session?.user?.email as string, "changePassword");
+  try {
+    await checkRateLimit(session?.user?.email as string, "changePassword");
+  } catch (error) {
+    if (error instanceof Error && error.message === "RATE_LIMITED") {
+      return { success: false, message: "Too many requests" };
+    }
+    throw error;
+  }
   const user = await prisma.user.findUnique({
     where: {
       id: session?.user?.id,
