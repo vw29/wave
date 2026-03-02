@@ -97,6 +97,7 @@ export default function Page({
                           label="Password"
                           field={field}
                           autoComplete="current-password"
+                          href="forget-password"
                         />
                       )}
                     />

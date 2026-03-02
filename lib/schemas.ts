@@ -48,6 +48,11 @@ export const changePasswordSchema = z
     path: ["newPassword"],
   });
 
+export const forgetPasswordSchema = z.object({
+  email: z.string().email("Invalid email address").trim().toLowerCase(),
+});
+
 export type RegisterSchema = z.infer<typeof registerSchema>;
 export type LoginSchema = z.infer<typeof loginSchema>;
 export type ChangePasswordSchema = z.infer<typeof changePasswordSchema>;
+export type ForgetPasswordSchema = z.infer<typeof forgetPasswordSchema>;

@@ -7,6 +7,7 @@ import type {
   FieldPath,
   FieldValues,
 } from "react-hook-form";
+import Link from "next/link";
 
 export default function PasswordField<
   TFieldValues extends FieldValues = FieldValues,
@@ -15,16 +16,29 @@ export default function PasswordField<
   label,
   field,
   autoComplete,
+  href,
 }: {
   label: string;
   field: ControllerRenderProps<TFieldValues, TName>;
   autoComplete: string;
+  href?: string;
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <FormItem>
-      <FormLabel>{label}</FormLabel>
+      <FormLabel className="flex items-center">
+        {label}
+        {href && (
+          <Link
+            href={href}
+            className="ml-auto text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+          >
+            Forgot your password?
+          </Link>
+        )}
+      </FormLabel>
+
       <div className="relative">
         <FormControl>
           <Input
