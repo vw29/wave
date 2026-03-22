@@ -1,7 +1,6 @@
 "use client";
 
 import PasswordField from "@/components/PasswordField";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,17 +11,16 @@ import {
 import { Form, FormField } from "@/components/ui/form";
 import { resetPassword } from "@/actions/auth/resetPassword";
 import { resetPasswordSchema, ResetPasswordSchema } from "@/lib/schemas";
-import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import Link from "next/link";
+import { FormRootError } from "@/components/auth/form-root-error";
+import { SubmitButton } from "@/components/auth/submit-button";
 
-export default function Page({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export default function Page() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const router = useRouter();
@@ -36,39 +34,34 @@ export default function Page({
 
   if (!token) {
     return (
-      <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-        <div className="w-full max-w-sm">
-          <div className={cn("flex flex-col gap-6", className)} {...props}>
-            <Card>
-              <CardHeader>
-                <CardTitle>Invalid Token</CardTitle>
-                <CardDescription>
-                  The token provided is invalid or has expired. Please request a
-                  new one.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  variant="outline"
-                  onClick={() => router.push("/forget-password")}
-                >
-                  Back to Forget Password
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>Invalid reset link</CardTitle>
+          <CardDescription>
+            This link is invalid or has expired. Please request a new one.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Link
+            href="/forget-password"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Request a new link
+          </Link>
+        </CardContent>
+      </Card>
     );
   }
+
   async function onSubmit(data: ResetPasswordSchema) {
     try {
       form.clearErrors("root");
-      const result = await resetPassword(data, token!);
+      const result = await resetPassword(data, token);
       if (!result.success) {
         form.setError("root", { message: result.message });
       } else {
-        toast.success("Your password has been updated successfully");
+        toast.success("Password updated successfully");
         router.push("/login");
       }
     } catch {
@@ -77,71 +70,57 @@ export default function Page({
   }
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
-          <Card>
-            <CardHeader>
-              <CardTitle>Set a new password</CardTitle>
-              <CardDescription>
-                Create a new password. Ensure it differs from your previous
-                passwords.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
-                  <fieldset
-                    disabled={form.formState.isSubmitting}
-                    className="flex flex-col gap-4"
-                  >
-                    <FormField
-                      control={form.control}
-                      name="password"
-                      render={({ field }) => (
-                        <PasswordField
-                          label="Password"
-                          field={field}
-                          autoComplete="new-password"
-                        />
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="passwordConfirmation"
-                      render={({ field }) => (
-                        <PasswordField
-                          label="Confirm Password"
-                          field={field}
-                          autoComplete="new-password"
-                        />
-                      )}
-                    />
-                    {form.formState.errors.root && (
-                      <p className="text-destructive text-sm text-center">
-                        {form.formState.errors.root.message}
-                      </p>
-                    )}
-                    <Button
-                      type="submit"
-                      disabled={form.formState.isSubmitting}
-                    >
-                      {form.formState.isSubmitting ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Resetting password...
-                        </>
-                      ) : (
-                        "Reset Password"
-                      )}
-                    </Button>
-                  </fieldset>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
+    <Card className="w-full max-w-sm">
+      <CardHeader>
+        <CardTitle>Set a new password</CardTitle>
+        <CardDescription>Enter your new password below.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <fieldset
+              disabled={form.formState.isSubmitting}
+              className="flex flex-col gap-4"
+            >
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <PasswordField
+                    label="New Password"
+                    field={field}
+                    autoComplete="new-password"
+                  />
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="passwordConfirmation"
+                render={({ field }) => (
+                  <PasswordField
+                    label="Confirm Password"
+                    field={field}
+                    autoComplete="new-password"
+                  />
+                )}
+              />
+              <FormRootError message={form.formState.errors.root?.message} />
+              <SubmitButton
+                isSubmitting={form.formState.isSubmitting}
+                label="Reset password"
+                loadingLabel="Resetting..."
+              />
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Back to sign in
+              </Link>
+            </fieldset>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }
