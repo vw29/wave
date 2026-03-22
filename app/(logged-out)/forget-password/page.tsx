@@ -25,13 +25,16 @@ import {
 import Link from "next/link";
 import { ArrowLeft, Loader2, MailCheck } from "lucide-react";
 import { forgetPassword } from "@/actions/auth/forgetPassword";
+import { useSearchParams } from "next/navigation";
 
 export default function Page() {
+  const searchParams = useSearchParams();
+  const email = decodeURIComponent(searchParams.get("email") || "");
   const [submitted, setSubmitted] = useState(false);
 
   const form = useForm<ForgetPasswordSchema>({
     resolver: zodResolver(forgetPasswordSchema),
-    defaultValues: { email: "" },
+    defaultValues: { email },
   });
 
   async function onSubmit(data: ForgetPasswordSchema) {

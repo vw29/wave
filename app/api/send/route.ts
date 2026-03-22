@@ -6,10 +6,10 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST() {
   try {
     const { data, error } = await resend.emails.send({
-      from: "Acme <onboarding@resend.dev>",
+      from: "Wave <onboarding@resend.dev>",
       to: ["delivered@resend.dev"],
       subject: "Hello world",
-      react: PasswordResetEmail({ username: "John" }),
+      react: PasswordResetEmail({ username: "John", resetUrl: "" }),
     });
 
     if (error) {

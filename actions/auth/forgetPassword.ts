@@ -39,7 +39,10 @@ export async function forgetPassword(data: ForgetPasswordSchema) {
 
   const { email } = result.data;
 
-  const user = await prisma?.user.findUnique({ where: { email } });
+  const user = await prisma?.user.findUnique({
+    where: { email },
+    select: { id: true, email: true, name: true, username: true },
+  });
 
   // Return generic message whether user exists or not to prevent email enumeration
   if (!user) return GENERIC_SUCCESS;
@@ -66,7 +69,6 @@ export async function forgetPassword(data: ForgetPasswordSchema) {
   const username = user.name ?? user.username ?? user.email;
 
   await resend.emails.send({
-    // Replace with your verified Resend domain: e.g. "Wave <noreply@yourdomain.com>"
     from: "Wave <onboarding@resend.dev>",
     to: user.email,
     subject: "Reset your Wave password",

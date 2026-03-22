@@ -51,7 +51,7 @@ export default function Page({
         toast.success("Login successful");
         router.push("/my-account");
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
     }
   }
@@ -98,7 +98,7 @@ export default function Page({
                           field={field}
                           autoComplete="current-password"
                           href={`/forget-password?email=${encodeURIComponent(
-                            form.getValues("email"),
+                            form.watch("email"),
                           )}`}
                         />
                       )}

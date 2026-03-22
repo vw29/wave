@@ -52,7 +52,22 @@ export const forgetPasswordSchema = z.object({
   email: z.string().email("Invalid email address").trim().toLowerCase(),
 });
 
+export const resetPasswordSchema = z
+  .object({
+    password: passwordSchema,
+    passwordConfirmation: z.string().min(1, "Confirm password is required"),
+  })
+  .refine((data) => data.password === data.passwordConfirmation, {
+    message: "Passwords do not match",
+    path: ["passwordConfirmation"],
+  })
+  .refine((data) => data.password !== data.passwordConfirmation, {
+    message: "New password must be different from current password",
+    path: ["password"],
+  });
+
 export type RegisterSchema = z.infer<typeof registerSchema>;
 export type LoginSchema = z.infer<typeof loginSchema>;
 export type ChangePasswordSchema = z.infer<typeof changePasswordSchema>;
 export type ForgetPasswordSchema = z.infer<typeof forgetPasswordSchema>;
+export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
