@@ -14,8 +14,17 @@ export async function checkRateLimit(identifier: string | null,type:"login"|"reg
     headerList.get("x-real-ip") ||
     "127.0.0.1";
 
-  const { success } = await ratelimit.limit(`${type}:${ip}:${identifier}`);
-  if (!success) {
-    throw new Error("RATE_LIMITED");
+  try {
+    const { success } = await ratelimit.limit(`${type}:${ip}:${identifier}`);
+    if (!success) {
+      throw new Error("RATE_LIMITED");
+    }
+  } catch (error) {
+    // If it's a rate limit error, re-throw it
+    if (error instanceof Error && error.message === "RATE_LIMITED") {
+      throw error;
+    }
+    // Otherwise it's a Redis connection issue — log it and allow the request through
+    console.error("[ratelimit] Redis unavailable, skipping rate limit check:", error);
   }
 }
