@@ -28,14 +28,23 @@ import Link from "next/link";
 import PasswordField from "@/components/PasswordField";
 import { FormRootError } from "@/components/auth/form-root-error";
 import { SubmitButton } from "@/components/auth/submit-button";
+import { useState } from "react";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 export default function Page() {
   const router = useRouter();
+  const [requiresTwoFactor, setRequiresTwoFactor] = useState(false);
+
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
+      twoFactorCode: "",
     },
   });
 
@@ -43,6 +52,10 @@ export default function Page() {
     try {
       form.clearErrors("root");
       const result = await loginUser(data);
+      if (result.requiresTwoFactor) {
+        setRequiresTwoFactor(true);
+        return;
+      }
       if (!result.success) {
         form.setError("root", { message: result.message });
       } else {
@@ -58,7 +71,11 @@ export default function Page() {
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle>Welcome back</CardTitle>
-        <CardDescription>Sign in to your account to continue.</CardDescription>
+        <CardDescription>
+          {requiresTwoFactor
+            ? "Enter the code from your authenticator app."
+            : "Sign in to your account to continue."}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -67,51 +84,86 @@ export default function Page() {
               disabled={form.formState.isSubmitting}
               className="flex flex-col gap-4"
             >
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="email"
-                        placeholder="john.doe@example.com"
-                        autoComplete="email"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <PasswordField
-                    label="Password"
-                    field={field}
-                    autoComplete="current-password"
-                    href={`/forget-password?email=${encodeURIComponent(form.watch("email"))}`}
+              {!requiresTwoFactor ? (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="email"
+                            placeholder="john.doe@example.com"
+                            autoComplete="email"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                )}
-              />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <PasswordField
+                        label="Password"
+                        field={field}
+                        autoComplete="current-password"
+                        href={`/forget-password?email=${encodeURIComponent(form.watch("email"))}`}
+                      />
+                    )}
+                  />
+                </>
+              ) : (
+                <FormField
+                  control={form.control}
+                  name="twoFactorCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Authenticator Code</FormLabel>
+                      <FormControl>
+                        <InputOTP
+                          maxLength={6}
+                          value={field.value}
+                          onChange={field.onChange}
+                        >
+                          <InputOTPGroup>
+                            <InputOTPSlot index={0} />
+                            <InputOTPSlot index={1} />
+                            <InputOTPSlot index={2} />
+                            <InputOTPSlot index={3} />
+                            <InputOTPSlot index={4} />
+                            <InputOTPSlot index={5} />
+                          </InputOTPGroup>
+                        </InputOTP>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               <FormRootError message={form.formState.errors.root?.message} />
               <div className="flex flex-col gap-2">
                 <SubmitButton
                   isSubmitting={form.formState.isSubmitting}
-                  label="Sign in"
-                  loadingLabel="Signing in..."
+                  label={requiresTwoFactor ? "Verify" : "Sign in"}
+                  loadingLabel={requiresTwoFactor ? "Verifying..." : "Signing in..."}
                 />
-                <Button variant="outline" type="button">
-                  Sign in with Google
-                </Button>
+                {!requiresTwoFactor && (
+                  <Button variant="outline" type="button">
+                    Sign in with Google
+                  </Button>
+                )}
               </div>
-              <FieldDescription className="text-center">
-                Don&apos;t have an account?{" "}
-                <Link href="/register">Sign up</Link>
-              </FieldDescription>
+              {!requiresTwoFactor && (
+                <FieldDescription className="text-center">
+                  Don&apos;t have an account?{" "}
+                  <Link href="/register">Sign up</Link>
+                </FieldDescription>
+              )}
             </fieldset>
           </form>
         </Form>
