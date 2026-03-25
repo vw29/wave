@@ -12,13 +12,12 @@ import { Form, FormField } from "@/components/ui/form";
 import { resetPassword } from "@/actions/auth/resetPassword";
 import { resetPasswordSchema, ResetPasswordSchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import Link from "next/link";
 import { FormRootError } from "@/components/auth/form-root-error";
 import { SubmitButton } from "@/components/auth/submit-button";
+import { BackLink } from "@/components/auth/back-link";
 
 export function ResetPasswordForm({ token }: { token: string }) {
   const router = useRouter();
@@ -86,13 +85,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
                 label="Reset password"
                 loadingLabel="Resetting..."
               />
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                Back to sign in
-              </Link>
+              <BackLink href="/login">Back to sign in</BackLink>
             </fieldset>
           </form>
         </Form>

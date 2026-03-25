@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Wave",
-  description: "Wave is social media app",
+  description: "Wave is a social media app",
 };
 
 export default async function RootLayout({

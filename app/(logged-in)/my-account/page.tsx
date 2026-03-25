@@ -14,13 +14,15 @@ export default async function Page() {
   const isTwoFactorActivated = twoFactorAuth?.twoFactorActivated ?? false;
 
   return (
-    <Card className="w-87.5">
+    <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle>My Account</CardTitle>
       </CardHeader>
-      <CardContent>
-        <label>Email</label>
-        <div className="text-muted-foreground">{session?.user?.email}</div>
+      <CardContent className="flex flex-col gap-4">
+        <div>
+          <p className="text-sm font-medium">Email</p>
+          <p className="text-sm text-muted-foreground">{session?.user?.email}</p>
+        </div>
         <TwoFactorAuthenticationForm
           isTwoFactorActivated={isTwoFactorActivated}
         />

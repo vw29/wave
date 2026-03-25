@@ -13,7 +13,7 @@ export const passwordSchema = z
   .refine((v) => /[0-9]/.test(v), {
     message: "Password must contain a number",
   })
-  .refine((v) => /[!@#$%^&*]/.test(v), {
+  .refine((v) => /[^A-Za-z0-9]/.test(v), {
     message: "Password must contain a special character",
   });
 
@@ -49,7 +49,7 @@ export const changePasswordSchema = z
     path: ["newPassword"],
   });
 
-export const forgetPasswordSchema = z.object({
+export const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address").trim().toLowerCase(),
 });
 
@@ -66,5 +66,5 @@ export const resetPasswordSchema = z
 export type RegisterSchema = z.infer<typeof registerSchema>;
 export type LoginSchema = z.infer<typeof loginSchema>;
 export type ChangePasswordSchema = z.infer<typeof changePasswordSchema>;
-export type ForgetPasswordSchema = z.infer<typeof forgetPasswordSchema>;
+export type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;

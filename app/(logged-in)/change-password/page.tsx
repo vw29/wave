@@ -1,15 +1,22 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Form, FormField } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangePasswordSchema, changePasswordSchema } from "@/lib/schemas";
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { changePassword } from "@/actions/auth/changePassword";
 import PasswordField from "@/components/PasswordField";
+import { FormRootError } from "@/components/auth/form-root-error";
+import { SubmitButton } from "@/components/auth/submit-button";
 
 export default function Page() {
   const router = useRouter();
@@ -37,6 +44,9 @@ export default function Page() {
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle>Change Password</CardTitle>
+        <CardDescription>
+          Update your password to keep your account secure.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -78,21 +88,12 @@ export default function Page() {
                   />
                 )}
               />
-              {form.formState.errors.root && (
-                <p className="text-destructive text-sm text-center">
-                  {form.formState.errors.root.message}
-                </p>
-              )}
-              <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Changing password...
-                  </>
-                ) : (
-                  "Change Password"
-                )}
-              </Button>
+              <FormRootError message={form.formState.errors.root?.message} />
+              <SubmitButton
+                isSubmitting={form.formState.isSubmitting}
+                label="Change Password"
+                loadingLabel="Changing password..."
+              />
             </fieldset>
           </form>
         </Form>
@@ -100,5 +101,3 @@ export default function Page() {
     </Card>
   );
 }
-
-//TODO: add password strength indicator

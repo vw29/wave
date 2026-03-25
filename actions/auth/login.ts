@@ -2,19 +2,15 @@
 
 import { signIn } from "@/auth";
 import { loginSchema, LoginSchema } from "@/lib/schemas";
+import { validateInput } from "@/lib/validation";
 import { AuthError } from "next-auth";
 import prisma from "@/lib/prisma";
 import argon2 from "argon2";
 import { verify } from "otplib";
 
 export async function loginUser(data: LoginSchema) {
-  const result = loginSchema.safeParse(data);
-  if (!result.success) {
-    return {
-      success: false,
-      message: result.error.issues[0]?.message ?? "Something went wrong",
-    };
-  }
+  const validated = validateInput(loginSchema, data);
+  if (!validated.success) return validated;
 
   const user = await prisma.user.findUnique({
     where: { email: data.email },

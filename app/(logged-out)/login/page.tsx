@@ -112,7 +112,7 @@ export default function Page() {
                         label="Password"
                         field={field}
                         autoComplete="current-password"
-                        href={`/forget-password?email=${encodeURIComponent(form.watch("email"))}`}
+                        href={`/forgot-password?email=${encodeURIComponent(form.watch("email"))}`}
                       />
                     )}
                   />
@@ -129,6 +129,8 @@ export default function Page() {
                           maxLength={6}
                           value={field.value}
                           onChange={field.onChange}
+                          onComplete={() => form.handleSubmit(onSubmit)()}
+                          autoFocus
                         >
                           <InputOTPGroup>
                             <InputOTPSlot index={0} />
@@ -149,8 +151,11 @@ export default function Page() {
               <div className="flex flex-col gap-2">
                 <SubmitButton
                   isSubmitting={form.formState.isSubmitting}
+                  disabled={requiresTwoFactor && form.watch("twoFactorCode")?.length !== 6}
                   label={requiresTwoFactor ? "Verify" : "Sign in"}
-                  loadingLabel={requiresTwoFactor ? "Verifying..." : "Signing in..."}
+                  loadingLabel={
+                    requiresTwoFactor ? "Verifying..." : "Signing in..."
+                  }
                 />
                 {!requiresTwoFactor && (
                   <Button variant="outline" type="button">

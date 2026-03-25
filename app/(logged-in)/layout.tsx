@@ -12,7 +12,7 @@ export default async function Layout({
   if (!session?.user?.id) redirect("/login");
   return (
     <main className="flex flex-col h-screen">
-      <nav className="flex items-center justify-between p-4 bg-gray-200">
+      <nav className="flex items-center justify-between p-4 bg-muted">
         <ul className="flex items-center gap-4">
           <li>
             <Link href="/my-account">My Account</Link>

@@ -2,84 +2,52 @@
 
 import { auth } from "@/auth";
 import { ChangePasswordSchema, changePasswordSchema } from "@/lib/schemas";
+import { validateInput } from "@/lib/validation";
+import { enforceRateLimit } from "@/lib/ratelimit";
+import { hashPassword } from "@/lib/password";
 import argon2 from "argon2";
 import prisma from "@/lib/prisma";
-import { checkRateLimit } from "@/lib/ratelimit";
 
 export async function changePassword(data: ChangePasswordSchema) {
-  const result = changePasswordSchema.safeParse(data);
+  const validated = validateInput(changePasswordSchema, data);
+  if (!validated.success) return validated;
 
-  if (!result.success) {
-    return {
-      success: false,
-      message: "Invalid data",
-    };
-  }
-
-  const { currentPassword, newPassword } = result.data;
+  const { currentPassword, newPassword } = validated.data;
 
   const session = await auth();
-
-  if (!session) {
-    return {
-      success: false,
-      message: "You are not logged in",
-    };
+  if (!session?.user?.id) {
+    return { success: false, message: "You are not logged in" };
   }
 
-  try {
-    await checkRateLimit(session?.user?.email as string, "changePassword");
-  } catch (error) {
-    if (error instanceof Error && error.message === "RATE_LIMITED") {
-      return { success: false, message: "Too many requests" };
-    }
-    throw error;
-  }
+  const rateLimitError = await enforceRateLimit(
+    session.user.email as string,
+    "changePassword",
+  );
+  if (rateLimitError) return rateLimitError;
+
   const user = await prisma.user.findUnique({
-    where: {
-      id: session?.user?.id,
-    },
-    select: {
-      passwordHash: true,
-    },
+    where: { id: session.user.id },
+    select: { passwordHash: true },
   });
 
   if (!user) {
-    return {
-      success: false,
-      message: "User not found",
-    };
+    return { success: false, message: "User not found" };
   }
 
   const isPasswordValid = await argon2.verify(
     user.passwordHash,
     currentPassword,
   );
-
   if (!isPasswordValid) {
-    return {
-      success: false,
-      message: "Invalid password",
-    };
+    return { success: false, message: "Invalid password" };
   }
 
-  const hashedNewPassword = await argon2.hash(newPassword);
+  const passwordHash = await hashPassword(newPassword);
 
-  try {
-    await prisma.user.update({
-      where: { id: session?.user?.id },
-      data: { passwordHash: hashedNewPassword },
-    });
+  await prisma.user.update({
+    where: { id: session.user.id },
+    data: { passwordHash },
+  });
 
-    return {
-      success: true,
-      message: "Password changed successfully",
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      success: false,
-      message: "Failed to change password",
-    };
-  }
+  return { success: true, message: "Password changed successfully" };
 }

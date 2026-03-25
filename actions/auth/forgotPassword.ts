@@ -1,7 +1,8 @@
 "use server";
 
-import { forgetPasswordSchema, ForgetPasswordSchema } from "@/lib/schemas";
-import { checkRateLimit } from "@/lib/ratelimit";
+import { forgotPasswordSchema, ForgotPasswordSchema } from "@/lib/schemas";
+import { validateInput } from "@/lib/validation";
+import { enforceRateLimit } from "@/lib/ratelimit";
 import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
@@ -15,50 +16,36 @@ const GENERIC_SUCCESS = {
   message: "If an account with that email exists, a reset link has been sent.",
 };
 
-export async function forgetPassword(data: ForgetPasswordSchema) {
+export async function forgotPassword(data: ForgotPasswordSchema) {
   const session = await auth();
-
   if (session?.user?.id) {
     return { success: false, message: "You are already logged in" };
   }
 
-  try {
-    await checkRateLimit(null, "forgetPassword");
-  } catch (error) {
-    if (error instanceof Error && error.message === "RATE_LIMITED") {
-      return { success: false, message: "Too many requests" };
-    }
-    throw error;
-  }
+  const rateLimitError = await enforceRateLimit(null, "forgotPassword");
+  if (rateLimitError) return rateLimitError;
 
-  const result = forgetPasswordSchema.safeParse(data);
+  const validated = validateInput(forgotPasswordSchema, data);
+  if (!validated.success) return validated;
 
-  if (!result.success) {
-    return { success: false, message: "Invalid data" };
-  }
+  const { email } = validated.data;
 
-  const { email } = result.data;
-
-  const user = await prisma?.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { email },
     select: { id: true, email: true, name: true, username: true },
   });
 
-  // Return generic message whether user exists or not to prevent email enumeration
   if (!user) return GENERIC_SUCCESS;
 
-  try {
-    await checkRateLimit(user.email, "forgetPassword");
-  } catch (error) {
-    if (error instanceof Error && error.message === "RATE_LIMITED") {
-      return { success: false, message: "Too many requests" };
-    }
-    throw error;
-  }
+  const perUserRateLimitError = await enforceRateLimit(
+    user.email,
+    "forgotPassword",
+  );
+  if (perUserRateLimitError) return perUserRateLimitError;
 
   const token = crypto.randomBytes(32).toString("hex");
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-  const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
   await prisma.passwordResetToken.create({
     data: { token: hashedToken, expiresAt, userId: user.id },

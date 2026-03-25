@@ -5,10 +5,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import { validateResetToken } from "@/actions/auth/validateResetToken";
 import { ResetPasswordForm } from "./reset-password-form";
+import { BackLink } from "@/components/auth/back-link";
 
 export default async function Page({
   searchParams,
@@ -29,13 +28,7 @@ export default async function Page({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Link
-            href="/forget-password"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Request a new link
-          </Link>
+          <BackLink href="/forgot-password">Request a new link</BackLink>
         </CardContent>
       </Card>
     );

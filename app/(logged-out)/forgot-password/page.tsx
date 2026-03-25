@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { forgetPasswordSchema, ForgetPasswordSchema } from "@/lib/schemas";
+import { forgotPasswordSchema, ForgotPasswordSchema } from "@/lib/schemas";
 import { FieldDescription } from "@/components/ui/field";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,24 +22,25 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Link from "next/link";
-import { ArrowLeft, MailCheck } from "lucide-react";
-import { forgetPassword } from "@/actions/auth/forgetPassword";
+import { MailCheck } from "lucide-react";
+import { forgotPassword } from "@/actions/auth/forgotPassword";
 import { useSearchParams } from "next/navigation";
 import { FormRootError } from "@/components/auth/form-root-error";
 import { SubmitButton } from "@/components/auth/submit-button";
+import { BackLink } from "@/components/auth/back-link";
 
 export default function Page() {
   const searchParams = useSearchParams();
   const email = decodeURIComponent(searchParams.get("email") || "");
   const [submitted, setSubmitted] = useState(false);
 
-  const form = useForm<ForgetPasswordSchema>({
-    resolver: zodResolver(forgetPasswordSchema),
+  const form = useForm<ForgotPasswordSchema>({
+    resolver: zodResolver(forgotPasswordSchema),
     defaultValues: { email },
   });
 
-  async function onSubmit(data: ForgetPasswordSchema) {
-    const result = await forgetPassword(data);
+  async function onSubmit(data: ForgotPasswordSchema) {
+    const result = await forgotPassword(data);
     if (result?.success) {
       setSubmitted(true);
     } else {
@@ -64,13 +64,7 @@ export default function Page() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to sign in
-          </Link>
+          <BackLink href="/login">Back to sign in</BackLink>
         </CardContent>
       </Card>
     );
@@ -115,13 +109,7 @@ export default function Page() {
                 label="Send reset link"
                 loadingLabel="Sending..."
               />
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                Back to sign in
-              </Link>
+              <BackLink href="/login">Back to sign in</BackLink>
               <FieldDescription className="text-center">
                 Don&apos;t have an account?{" "}
                 <Link href="/register">Sign up</Link>

@@ -2,12 +2,22 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { headers } from "next/headers";
 
-export const ratelimit = new Ratelimit({
+type RateLimitAction =
+  | "login"
+  | "register"
+  | "changePassword"
+  | "forgotPassword"
+  | "resetPassword";
+
+const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
   limiter: Ratelimit.slidingWindow(7, "60 s"),
 });
 
-export async function checkRateLimit(identifier: string | null,type:"login"|"register"|"changePassword"|"forgetPassword"|"resetPassword") {
+export async function checkRateLimit(
+  identifier: string | null,
+  type: RateLimitAction,
+) {
   const headerList = await headers();
   const ip =
     headerList.get("x-forwarded-for")?.split(",")[0] ||
@@ -20,11 +30,30 @@ export async function checkRateLimit(identifier: string | null,type:"login"|"reg
       throw new Error("RATE_LIMITED");
     }
   } catch (error) {
-    // If it's a rate limit error, re-throw it
     if (error instanceof Error && error.message === "RATE_LIMITED") {
       throw error;
     }
-    // Otherwise it's a Redis connection issue — log it and allow the request through
-    console.error("[ratelimit] Redis unavailable, skipping rate limit check:", error);
+    console.error(
+      "[ratelimit] Redis unavailable, skipping rate limit check:",
+      error,
+    );
+  }
+}
+
+export async function enforceRateLimit(
+  identifier: string | null,
+  type: RateLimitAction,
+): Promise<{ success: false; message: string } | null> {
+  try {
+    await checkRateLimit(identifier, type);
+    return null;
+  } catch (error) {
+    if (error instanceof Error && error.message === "RATE_LIMITED") {
+      return {
+        success: false,
+        message: "Too many requests. Please try again later.",
+      };
+    }
+    throw error;
   }
 }
