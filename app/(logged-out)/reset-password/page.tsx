@@ -1,13 +1,10 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AuthCard } from "@/components/auth";
 import { validateResetToken } from "@/actions/auth/validateResetToken";
 import { ResetPasswordForm } from "./reset-password-form";
-import { BackLink } from "@/components/auth/back-link";
+import { AUTH_TEXT } from "@/lib/constants";
+import Link from "next/link";
+import { ShieldAlert } from "lucide-react";
 
 export default async function Page({
   searchParams,
@@ -20,17 +17,19 @@ export default async function Page({
 
   if (!isValid) {
     return (
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Invalid reset link</CardTitle>
-          <CardDescription>
-            This link is invalid or has expired. Please request a new one.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <BackLink href="/forgot-password">Request a new link</BackLink>
-        </CardContent>
-      </Card>
+      <main className="flex justify-center items-center min-h-screen p-4">
+        <AuthCard
+          icon={ShieldAlert}
+          title={AUTH_TEXT.updatePassword.invalidTitle}
+          description={AUTH_TEXT.updatePassword.invalidDescription}
+        >
+          <Button asChild className="w-full">
+            <Link href="/forgot-password">
+              {AUTH_TEXT.updatePassword.requestNew}
+            </Link>
+          </Button>
+        </AuthCard>
+      </main>
     );
   }
 
