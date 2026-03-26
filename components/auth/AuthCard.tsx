@@ -60,7 +60,7 @@ export function AuthCard({
       <CardContent>{children}</CardContent>
       {footer && (
         <>
-          <Separator className="mx-auto !w-3/4" />
+          <Separator className="mx-auto w-3/4!" />
           <CardFooter className="flex-col gap-2 pt-2 pb-1">{footer}</CardFooter>
         </>
       )}

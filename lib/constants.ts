@@ -135,6 +135,24 @@ export const ERROR_MESSAGES = {
   networkError: "Unable to connect. Check your internet and try again.",
 } as const;
 
+export const EMAIL_TEXT = {
+  passwordReset: {
+    subject: "Reset your password",
+    heading: "Reset your password",
+    greeting: (name: string) => `Hi ${name},`,
+    body: "We received a request to reset your password. Tap the button below to choose a new one.",
+    cta: "Reset password",
+    expiry: "This link expires in 15 minutes.",
+    fallback: "Button not working? Copy and paste this link into your browser:",
+    disclaimer:
+      "If you didn't request this, you can safely ignore this email. Your password won't be changed.",
+  },
+  common: {
+    brand: "Wave",
+    copyright: (year: number) => `${year} Wave. All rights reserved.`,
+  },
+} as const;
+
 export const TOAST_MESSAGES = {
   loginSuccess: "Signed in successfully",
   registerSuccess: "Account created successfully",
