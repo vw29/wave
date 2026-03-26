@@ -34,6 +34,9 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { AuthCard } from "@/components/auth/AuthCard";
+import { LogIn } from "lucide-react";
+import { AUTH_TEXT } from "@/lib/constants";
 
 export default function Page() {
   const router = useRouter();
@@ -67,17 +70,36 @@ export default function Page() {
     }
   }
 
+  const emailValue = form.watch("email");
+  const resetHref = emailValue
+    ? `/password-reset?email=${encodeURIComponent(emailValue)}`
+    : "/password-reset";
+
+  const footer = (
+    <>
+      <div className="text-muted-foreground text-sm text-center">
+        {AUTH_TEXT.login.noAccount}{" "}
+        <Link href="/register" className="underline hover:text-foreground">
+          {AUTH_TEXT.common.register}
+        </Link>
+      </div>
+      <div className="text-muted-foreground text-sm text-center">
+        {AUTH_TEXT.login.forgotPassword}{" "}
+        <Link href={resetHref} className="underline hover:text-foreground">
+          Reset Password
+        </Link>
+      </div>
+    </>
+  );
+
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle>Welcome back</CardTitle>
-        <CardDescription>
-          {requiresTwoFactor
-            ? "Enter the code from your authenticator app."
-            : "Sign in to your account to continue."}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <main className="flex justify-center items-center min-h-screen p-4">
+      <AuthCard
+        icon={LogIn}
+        title={"Hello "}
+        description={"hEllo AgAIN "}
+        footer={footer}
+      >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <fieldset
@@ -151,17 +173,15 @@ export default function Page() {
               <div className="flex flex-col gap-2">
                 <SubmitButton
                   isSubmitting={form.formState.isSubmitting}
-                  disabled={requiresTwoFactor && form.watch("twoFactorCode")?.length !== 6}
+                  disabled={
+                    requiresTwoFactor &&
+                    form.watch("twoFactorCode")?.length !== 6
+                  }
                   label={requiresTwoFactor ? "Verify" : "Sign in"}
                   loadingLabel={
                     requiresTwoFactor ? "Verifying..." : "Signing in..."
                   }
                 />
-                {!requiresTwoFactor && (
-                  <Button variant="outline" type="button">
-                    Sign in with Google
-                  </Button>
-                )}
               </div>
               {!requiresTwoFactor && (
                 <FieldDescription className="text-center">
@@ -172,7 +192,7 @@ export default function Page() {
             </fieldset>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+      </AuthCard>
+    </main>
   );
 }
