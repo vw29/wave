@@ -1,6 +1,5 @@
 import { auth } from "@/auth";
-import LogoutButton from "@/components/LogoutButton";
-import Link from "next/link";
+import Navbar from "@/components/feed/Navbar";
 import { redirect } from "next/navigation";
 
 export default async function Layout({
@@ -11,19 +10,11 @@ export default async function Layout({
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
   return (
-    <main className="flex flex-col h-screen">
-      <nav className="flex items-center justify-between p-4 bg-muted">
-        <ul className="flex items-center gap-4">
-          <li>
-            <Link href="/my-account">My Account</Link>
-          </li>
-          <li>
-            <Link href="/change-password">Change Password</Link>
-          </li>
-        </ul>
-        <LogoutButton />
-      </nav>
-      <div className="flex-1 flex justify-center items-center">{children}</div>
-    </main>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex justify-center">{children}</div>
+      </main>
+    </div>
   );
 }

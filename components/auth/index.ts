@@ -1,7 +1,9 @@
 export { AuthCard } from "./AuthCard";
 export { EmailField } from "./EmailField";
+export { UsernameField } from "./UsernameField";
 export { PasswordField } from "./PasswordField";
 export { ConfirmPasswordField } from "./ConfirmPasswordField";
+export { ProfileImageUpload } from "./ProfileImageUpload";
 export { SuccessCard } from "./SuccessCard";
 export { FormRootError } from "./form-root-error";
 export { SubmitButton } from "./submit-button";

@@ -15,7 +15,7 @@ datasource db {
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
-  username     String?   //TODO: add unique
+  username     String   @unique
   name         String?
   passwordHash String
   profileImage String?
@@ -28,6 +28,7 @@ model User {
   posts                 Post[]
   comments              Comment[]
   likes                 Like[]
+  commentLikes          CommentLike[]
   notificationsSent     Notification[] @relation("NotificationSender")
   notificationsReceived Notification[] @relation("NotificationReceiver")
   
@@ -67,10 +68,22 @@ model Comment {
 
   author        User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
   post          Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  likes         CommentLike[]
   notifications Notification[]
 
   @@index([postId])
   @@index([authorId])
+}
+
+model CommentLike {
+  userId    String
+  commentId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@id([userId, commentId])
 }
 
 model Like {

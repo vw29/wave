@@ -23,6 +23,12 @@ export const AUTH_TEXT = {
     successTitle: "You're all set",
     successDescription:
       "Your account has been created. Check your email to verify.",
+    step2Title: "Complete your profile",
+    step2Description: "Tell us a bit about yourself",
+    step2Submit: "Save profile",
+    step2Submitting: "Saving...",
+    skip: "Skip for now",
+    loggingIn: "Logging you in...",
   },
 
   passwordReset: {
@@ -117,6 +123,25 @@ export const FORM_TEXT = {
     label: "Current password",
     placeholder: "Enter your current password",
   },
+  username: {
+    label: "Username",
+    placeholder: "your_username",
+  },
+  name: {
+    label: "Display name",
+    placeholder: "Your name",
+  },
+  bio: {
+    label: "Bio",
+    placeholder: "Tell us about yourself",
+  },
+  profileImage: {
+    label: "Profile image",
+  },
+  website: {
+    label: "Website",
+    placeholder: "https://example.com",
+  },
 } as const;
 
 export const ERROR_MESSAGES = {
@@ -133,6 +158,7 @@ export const ERROR_MESSAGES = {
   invalidTwoFactorCode: "Invalid authenticator code",
   rateLimited: "Too many attempts. Please try again later.",
   networkError: "Unable to connect. Check your internet and try again.",
+  usernameTaken: "This username is already taken",
 } as const;
 
 export const EMAIL_TEXT = {
@@ -161,5 +187,6 @@ export const TOAST_MESSAGES = {
   passwordChanged: "Password changed successfully",
   twoFactorEnabled: "Two-factor authentication enabled",
   twoFactorDisabled: "Two-factor authentication disabled",
+  profileUpdated: "Profile saved successfully",
   genericError: "Something went wrong",
 } as const;

@@ -16,20 +16,24 @@ export async function registerUser(data: RegisterSchema) {
   const passwordHash = await hashPassword(data.password);
 
   try {
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         email: data.email,
         passwordHash,
-        username: data.email.split("@")[0],
+        username: data.username,
       },
     });
 
-    return { success: true };
+    return { success: true as const, email: user.email };
   } catch (error: unknown) {
     const err = error as { code?: string; meta?: { target?: string[] } };
     if (err?.code === "P2002") {
-      return { success: false, message: "Email already exists" };
+      const target = err.meta?.target;
+      if (target?.includes("username")) {
+        return { success: false as const, message: "This username is already taken" };
+      }
+      return { success: false as const, message: "Email already exists" };
     }
-    return { success: false, message: "Something went wrong" };
+    return { success: false as const, message: "Something went wrong" };
   }
 }

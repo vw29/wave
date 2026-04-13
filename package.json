@@ -12,11 +12,13 @@
     "@hookform/resolvers": "^5.2.2",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
+    "@uploadthing/react": "^7.3.3",
     "@upstash/ratelimit": "^2.0.8",
     "argon2": "^0.44.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.4",
+    "emoji-picker-react": "^4.18.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
@@ -33,6 +35,7 @@
     "react-loader-spinner": "^8.0.2",
     "resend": "^6.9.3",
     "tailwind-merge": "^3.4.0",
+    "uploadthing": "^7.7.4",
     "zod": "^4.3.6"
   },
   "devDependencies": {
