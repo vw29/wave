@@ -16,6 +16,9 @@ export async function updateProfile(email: string, data: ProfileSchema) {
         bio: validated.data.bio?.trim() || null,
         profileImage: validated.data.profileImage?.trim() || null,
         website: validated.data.website?.trim() || null,
+        school: validated.data.school?.trim() || null,
+        city: validated.data.city?.trim() || null,
+        workplace: validated.data.workplace?.trim() || null,
       },
     });
 

@@ -142,6 +142,18 @@ export const FORM_TEXT = {
     label: "Website",
     placeholder: "https://example.com",
   },
+  school: {
+    label: "School",
+    placeholder: "Your school or university",
+  },
+  city: {
+    label: "City",
+    placeholder: "Where you live",
+  },
+  workplace: {
+    label: "Workplace",
+    placeholder: "Where you work",
+  },
 } as const;
 
 export const ERROR_MESSAGES = {

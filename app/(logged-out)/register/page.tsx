@@ -54,6 +54,9 @@ export default function Page() {
       bio: "",
       profileImage: "",
       website: "",
+      school: "",
+      city: "",
+      workplace: "",
     },
   });
 
@@ -224,6 +227,54 @@ export default function Page() {
                             {...field}
                             type="url"
                             placeholder={FORM_TEXT.website.placeholder}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={step2Form.control}
+                    name="school"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{FORM_TEXT.school.label}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder={FORM_TEXT.school.placeholder}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={step2Form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{FORM_TEXT.city.label}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder={FORM_TEXT.city.placeholder}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={step2Form.control}
+                    name="workplace"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{FORM_TEXT.workplace.label}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder={FORM_TEXT.workplace.placeholder}
                           />
                         </FormControl>
                         <FormMessage />

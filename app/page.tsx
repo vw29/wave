@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import { getSuggestions } from "@/actions/social/getSuggestions";
 import Navbar from "@/components/feed/Navbar";
 import PostCard from "@/components/feed/PostCard";
 import PostComposer from "@/components/feed/PostComposer";
@@ -59,30 +60,8 @@ export default async function Home() {
     }
   }
 
-  // Get follow suggestions (users the current user doesn't follow)
-  let suggestions: {
-    id: string;
-    name: string | null;
-    username: string;
-    profileImage: string | null;
-  }[] = [];
-  if (currentUserId) {
-    suggestions = await prisma.user.findMany({
-      where: {
-        id: { not: currentUserId },
-        followers: {
-          none: { followerId: currentUserId },
-        },
-      },
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        profileImage: true,
-      },
-      take: 3,
-    });
-  }
+  // Get ranked "People You May Know" suggestions
+  const suggestions = currentUserId ? await getSuggestions(5) : [];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

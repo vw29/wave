@@ -50,6 +50,9 @@ export const profileSchema = z.object({
       message: "Must be a valid URL",
     })
     .optional(),
+  school: z.string().max(100, "School must be at most 100 characters").optional(),
+  city: z.string().max(100, "City must be at most 100 characters").optional(),
+  workplace: z.string().max(100, "Workplace must be at most 100 characters").optional(),
 });
 
 export const loginSchema = z.object({
@@ -87,6 +90,11 @@ export const resetPasswordSchema = z
     path: ["passwordConfirmation"],
   });
 
+export const editProfileSchema = profileSchema.extend({
+  username: usernameSchema,
+});
+
+export type EditProfileSchema = z.infer<typeof editProfileSchema>;
 export type RegisterSchema = z.infer<typeof registerSchema>;
 export type LoginSchema = z.infer<typeof loginSchema>;
 export type ChangePasswordSchema = z.infer<typeof changePasswordSchema>;

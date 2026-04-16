@@ -1,13 +1,9 @@
 "use client";
 
-import { useState } from "react";
-
-interface Suggestion {
-  id: string;
-  name: string | null;
-  username: string;
-  profileImage: string | null;
-}
+import { useState, useTransition } from "react";
+import { followUser } from "@/actions/social/followUser";
+import { unfollowUser } from "@/actions/social/unfollowUser";
+import type { Suggestion } from "@/actions/social/getSuggestions";
 
 interface WhoToFollowProps {
   suggestions: Suggestion[];
@@ -17,19 +13,37 @@ const GRADIENTS = [
   "from-orange-500 to-pink-600",
   "from-cyan-500 to-blue-600",
   "from-emerald-500 to-teal-600",
+  "from-violet-500 to-purple-600",
+  "from-amber-500 to-red-600",
 ];
 
 export default function WhoToFollow({ suggestions }: WhoToFollowProps) {
   const [followed, setFollowed] = useState<Set<string>>(new Set());
+  const [isPending, startTransition] = useTransition();
 
   if (suggestions.length === 0) return null;
 
-  const toggleFollow = (id: string) => {
+  const handleFollow = (userId: string) => {
+    const isFollowed = followed.has(userId);
     setFollowed((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (isFollowed) next.delete(userId);
+      else next.add(userId);
       return next;
+    });
+
+    startTransition(async () => {
+      const result = isFollowed
+        ? await unfollowUser(userId)
+        : await followUser(userId);
+      if ("error" in result) {
+        setFollowed((prev) => {
+          const next = new Set(prev);
+          if (isFollowed) next.add(userId);
+          else next.delete(userId);
+          return next;
+        });
+      }
     });
   };
 
@@ -49,12 +63,13 @@ export default function WhoToFollow({ suggestions }: WhoToFollowProps) {
             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
           />
         </svg>
-        Who to follow
+        People you may know
       </h3>
 
       <div className="space-y-3">
         {suggestions.map((s, i) => {
           const displayName = s.name || s.username;
+          const isFollowed = followed.has(s.id);
           return (
             <div
               key={s.id}
@@ -81,26 +96,28 @@ export default function WhoToFollow({ suggestions }: WhoToFollowProps) {
                   <p className="text-xs text-muted-foreground truncate">
                     @{s.username}
                   </p>
+                  {s.reasons.length > 0 && (
+                    <p className="text-xs text-muted-foreground/70 truncate mt-0.5">
+                      {s.reasons[0]}
+                    </p>
+                  )}
                 </div>
               </div>
               <button
-                onClick={() => toggleFollow(s.id)}
+                onClick={() => handleFollow(s.id)}
+                disabled={isPending}
                 className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-200 flex-shrink-0 ml-3 ${
-                  followed.has(s.id)
+                  isFollowed
                     ? "bg-transparent border border-border text-muted-foreground hover:border-red-500/50 hover:text-red-400"
                     : "bg-white hover:bg-gray-100 text-gray-900"
                 }`}
               >
-                {followed.has(s.id) ? "Following" : "Follow"}
+                {isFollowed ? "Following" : "Follow"}
               </button>
             </div>
           );
         })}
       </div>
-
-      <button className="text-blue-400 text-sm mt-3 hover:text-blue-300 transition-colors font-medium">
-        Show more
-      </button>
     </div>
   );
 }
