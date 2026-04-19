@@ -148,12 +148,12 @@ export default async function Page({ params }: PageProps) {
 
   const likedPostsList = likedPosts.map((l: { post: PostWithAuthor }) => l.post);
   const savedPostsList = Array.isArray(savedPosts)
-    ? (savedPosts as { post: PostWithAuthor }[]).map((b) => b.post)
+    ? (savedPosts as { post: PostWithAuthor }[]).map((b: { post: PostWithAuthor }) => b.post)
     : [];
 
-  const allPostIds = userPosts.map((p) => p.id);
-  const allLikedTabPostIds = likedPostsList.map((p) => p.id);
-  const allSavedTabPostIds = savedPostsList.map((p) => p.id);
+  const allPostIds = userPosts.map((p: PostWithAuthor) => p.id);
+  const allLikedTabPostIds = likedPostsList.map((p: PostWithAuthor) => p.id);
+  const allSavedTabPostIds = savedPostsList.map((p: PostWithAuthor) => p.id);
   const allRelevantPostIds = [
     ...allPostIds,
     ...allLikedTabPostIds,
@@ -179,11 +179,11 @@ export default async function Page({ params }: PageProps) {
   }
 
   const likedSet = new Set(currentUserLikedPostIds);
-  const likedPostIds = allPostIds.filter((id) => likedSet.has(id));
-  const likedPostIdsInLikedTab = allLikedTabPostIds.filter((id) =>
+  const likedPostIds = allPostIds.filter((id: string) => likedSet.has(id));
+  const likedPostIdsInLikedTab = allLikedTabPostIds.filter((id: string) =>
     likedSet.has(id)
   );
-  const likedPostIdsInSavedTab = allSavedTabPostIds.filter((id) =>
+  const likedPostIdsInSavedTab = allSavedTabPostIds.filter((id: string) =>
     likedSet.has(id)
   );
 
