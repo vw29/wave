@@ -99,7 +99,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
   let likedPostIds = new Set<string>();
   let bookmarkedPostIds = new Set<string>();
   if (currentUserId && posts.length > 0) {
-    const ids = posts.map((p) => p.id);
+    const ids = posts.map((p: SearchPost) => p.id);
     const [likes, bookmarks] = await Promise.all([
       prisma.like.findMany({
         where: { userId: currentUserId, postId: { in: ids } },
