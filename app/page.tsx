@@ -72,8 +72,8 @@ export default async function Home() {
         select: { postId: true },
       }),
     ]);
-    likedPostIds = new Set(likes.map((l: any) => l.postId));
-    bookmarkedPostIds = new Set(bookmarks.map((b: any) => b.postId));
+    likedPostIds = new Set(likes.map((l: { postId: string }) => l.postId));
+    bookmarkedPostIds = new Set(bookmarks.map((b: { postId: string }) => b.postId));
   }
 
   // Get current user info for the composer
@@ -143,7 +143,14 @@ export default async function Home() {
                 </p>
               </div>
             ) : (
-              posts.map((post: any) => (
+              (posts as unknown as {
+                id: string;
+                content: string;
+                image: string | null;
+                createdAt: Date;
+                author: { id: string; username: string; name: string | null; profileImage: string | null };
+                _count: { likes: number; comments: number };
+              }[]).map((post) => (
                 <PostCard
                   key={post.id}
                   post={post}

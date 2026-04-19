@@ -121,9 +121,13 @@ export async function getSuggestions(limit: number = 5): Promise<Suggestion[]> {
     limit * 3,
   );
 
-  const scored: Suggestion[] = rawCandidates.map((c: any) => {
+  const scored: Suggestion[] = rawCandidates.map((c: RawCandidate) => {
     const mutualCount = Number(c.mutual_friend_count);
-    const { bonus, reasons } = scoreAttributes(currentUser, c);
+    const { bonus, reasons } = scoreAttributes(currentUser, {
+      school: c.school,
+      city: c.city,
+      workplace: c.workplace,
+    });
 
     if (mutualCount > 0) {
       reasons.unshift(`${mutualCount} mutual friend${mutualCount > 1 ? "s" : ""}`);

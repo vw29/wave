@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Lock, Mail, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,12 +30,20 @@ export default function ChangeEmailModal({
   const [twoFactorCode, setTwoFactorCode] = useState("");
   const [step, setStep] = useState<"credentials" | "2fa">("credentials");
 
+  const handleClose = useCallback(() => {
+    setPassword("");
+    setNewEmail("");
+    setTwoFactorCode("");
+    setStep("credentials");
+    onClose();
+  }, [onClose]);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && handleClose();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [open, handleClose]);
 
   useEffect(() => {
     if (open) {
@@ -45,14 +53,6 @@ export default function ChangeEmailModal({
       };
     }
   }, [open]);
-
-  function handleClose() {
-    setPassword("");
-    setNewEmail("");
-    setTwoFactorCode("");
-    setStep("credentials");
-    onClose();
-  }
 
   function handleCredentialsSubmit(e: React.FormEvent) {
     e.preventDefault();

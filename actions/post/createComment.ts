@@ -83,7 +83,7 @@ export async function createComment(postId: string, text: string, parentId?: str
 
   revalidatePath("/");
   revalidatePath(`/post/${postId}`);
-  const { post: _post, ...commentData } = comment;
+  const { post: _unusedPost, ...commentData } = comment;
   return {
     success: true,
     comment: {
@@ -92,7 +92,25 @@ export async function createComment(postId: string, text: string, parentId?: str
       isPinned: false,
       likeCount: 0,
       likedByMe: false,
-      replies: [] as any[],
+      replies: [] as MappedComment[],
     },
   };
+}
+
+interface MappedComment {
+  id: string;
+  text: string;
+  createdAt: Date;
+  updatedAt: Date;
+  parentId: string | null;
+  isPinned: boolean;
+  author: {
+    id: string;
+    username: string;
+    name: string | null;
+    profileImage: string | null;
+  };
+  likeCount: number;
+  likedByMe: boolean;
+  replies: MappedComment[];
 }

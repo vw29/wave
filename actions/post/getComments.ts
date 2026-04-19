@@ -43,13 +43,26 @@ interface MappedComment {
   replies: MappedComment[];
 }
 
-function mapComment(c: any): MappedComment {
+interface RawComment {
+  id: string;
+  text: string;
+  createdAt: Date;
+  updatedAt: Date;
+  parentId: string | null;
+  isPinned: boolean;
+  author: { id: string; username: string; name: string | null; profileImage: string | null };
+  _count: { likes: number };
+  likes?: { userId: string }[];
+  replies?: RawComment[];
+}
+
+function mapComment(c: RawComment): MappedComment {
   return {
     id: c.id,
     text: c.text,
     createdAt: c.createdAt,
     updatedAt: c.updatedAt,
-    parentId: c.parentId as string | null,
+    parentId: c.parentId,
     isPinned: c.isPinned ?? false,
     author: c.author,
     likeCount: c._count.likes,

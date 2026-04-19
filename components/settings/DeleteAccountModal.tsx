@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { UserX, CheckCircle2, Lock, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,15 @@ export default function DeleteAccountModal({
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleClose = useCallback(() => {
+    setPassword("");
+    setTwoFactorCode("");
+    setStep("confirm");
+    setError(null);
+    setIsDeleting(false);
+    onClose();
+  }, [onClose]);
+
   useEffect(() => {
     if (!open) return;
 
@@ -54,16 +63,7 @@ export default function DeleteAccountModal({
       window.removeEventListener("keydown", onKey);
       clearTimeout(t);
     };
-  }, [open, onClose]);
-
-  function handleClose() {
-    setPassword("");
-    setTwoFactorCode("");
-    setStep("confirm");
-    setError(null);
-    setIsDeleting(false);
-    onClose();
-  }
+  }, [open, handleClose]);
 
   function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault();

@@ -1,4 +1,4 @@
-import { getAvatarGradient } from "@/lib/utils";
+
 
 interface AvatarDisplayProps {
   name: string;
@@ -32,7 +32,7 @@ export default function AvatarDisplay({
   }
   return (
     <div
-      className={`${dim} rounded-full bg-gradient-to-br ${getAvatarGradient(name)} flex items-center justify-center ${text} font-bold text-white flex-shrink-0 ${className}`}
+      className={`${dim} rounded-full bg-muted border border-border flex items-center justify-center ${text} font-bold text-foreground flex-shrink-0 ${className}`}
     >
       {name.charAt(0).toUpperCase()}
     </div>

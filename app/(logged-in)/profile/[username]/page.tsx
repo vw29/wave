@@ -82,6 +82,20 @@ export default async function Page({ params }: PageProps) {
     _count: { select: { likes: true, comments: true } },
   };
 
+  interface PostWithAuthor {
+    id: string;
+    content: string;
+    image: string | null;
+    createdAt: Date;
+    author: {
+      id: string;
+      username: string;
+      name: string | null;
+      profileImage: string | null;
+    };
+    _count: { likes: number; comments: number };
+  }
+
   // Fetch data in parallel
   const [userPosts, likedPosts, savedPosts, followRecord, currentUserProfile] =
     await Promise.all([
@@ -91,7 +105,7 @@ export default async function Page({ params }: PageProps) {
         orderBy: { createdAt: "desc" },
         take: 50,
         include: postInclude,
-      }),
+      }) as Promise<PostWithAuthor[]>,
 
       // Posts the user has liked
       prisma.like.findMany({
@@ -99,17 +113,17 @@ export default async function Page({ params }: PageProps) {
         orderBy: { createdAt: "desc" },
         take: 50,
         select: { post: { include: postInclude } },
-      }),
+      }) as Promise<{ post: PostWithAuthor }[]>,
 
       // Saved/bookmarked posts (owner only)
-      isOwner
+      (isOwner
         ? prisma.bookmark.findMany({
             where: { userId: user.id },
             orderBy: { createdAt: "desc" },
             take: 50,
             select: { post: { include: postInclude } },
           })
-        : [],
+        : Promise.resolve([])) as Promise<{ post: PostWithAuthor }[]>,
 
       // Check if current user follows this profile
       currentUserId && !isOwner
@@ -132,14 +146,14 @@ export default async function Page({ params }: PageProps) {
         : null,
     ]);
 
-  const likedPostsList = likedPosts.map((l: any) => l.post);
+  const likedPostsList = likedPosts.map((l) => l.post);
   const savedPostsList = Array.isArray(savedPosts)
-    ? savedPosts.map((b: any) => b.post)
+    ? savedPosts.map((b) => b.post)
     : [];
 
-  const allPostIds = userPosts.map((p: any) => p.id);
-  const allLikedTabPostIds = likedPostsList.map((p: any) => p.id);
-  const allSavedTabPostIds = savedPostsList.map((p: any) => p.id);
+  const allPostIds = userPosts.map((p) => p.id);
+  const allLikedTabPostIds = likedPostsList.map((p) => p.id);
+  const allSavedTabPostIds = savedPostsList.map((p) => p.id);
   const allRelevantPostIds = [
     ...allPostIds,
     ...allLikedTabPostIds,
@@ -160,8 +174,8 @@ export default async function Page({ params }: PageProps) {
         select: { postId: true },
       }),
     ]);
-    currentUserLikedPostIds = likes.map((l: any) => l.postId);
-    currentUserBookmarkedPostIds = bookmarks.map((b: any) => b.postId);
+    currentUserLikedPostIds = likes.map((l) => l.postId);
+    currentUserBookmarkedPostIds = bookmarks.map((b) => b.postId);
   }
 
   const likedSet = new Set(currentUserLikedPostIds);

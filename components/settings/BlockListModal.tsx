@@ -18,13 +18,30 @@ export default function BlockListModal({ open, onClose }: BlockListModalProps) {
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
 
+  // Track the previous 'open' state to reset internal state when the modal is reopened
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open && !prevOpen) {
+    setPrevOpen(true);
+    setLoading(true);
+    setUsers([]);
+  } else if (!open && prevOpen) {
+    setPrevOpen(false);
+  }
+
   useEffect(() => {
     if (!open) return;
-    setLoading(true);
+    
+    let cancelled = false;
     getBlockedUsers().then((data) => {
-      setUsers(data);
-      setLoading(false);
+      if (!cancelled) {
+        setUsers(data);
+        setLoading(false);
+      }
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, [open]);
 
   useEffect(() => {
