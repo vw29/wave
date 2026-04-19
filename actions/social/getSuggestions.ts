@@ -121,7 +121,7 @@ export async function getSuggestions(limit: number = 5): Promise<Suggestion[]> {
     limit * 3,
   );
 
-  const scored: Suggestion[] = rawCandidates.map((c) => {
+  const scored: Suggestion[] = rawCandidates.map((c: any) => {
     const mutualCount = Number(c.mutual_friend_count);
     const { bonus, reasons } = scoreAttributes(currentUser, c);
 
@@ -144,7 +144,7 @@ export async function getSuggestions(limit: number = 5): Promise<Suggestion[]> {
 
   // Phase 2: Attribute-based fallback for cold-start users
   if (scored.length < limit) {
-    const excludeIds = [currentUserId, ...scored.map((s) => s.id)];
+    const excludeIds = [currentUserId, ...scored.map((s: Suggestion) => s.id)];
     const remaining = limit - scored.length;
 
     const attrFilters = [
@@ -186,7 +186,7 @@ export async function getSuggestions(limit: number = 5): Promise<Suggestion[]> {
 
   // Phase 3: Random fallback for brand-new users with no attributes
   if (scored.length < limit) {
-    const excludeIds = [currentUserId, ...scored.map((s) => s.id)];
+    const excludeIds = [currentUserId, ...scored.map((s: Suggestion) => s.id)];
     const remaining = limit - scored.length;
 
     const randomUsers = await prisma.user.findMany({

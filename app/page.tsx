@@ -26,7 +26,7 @@ export default async function Home() {
       select: { blockerId: true, blockedId: true },
     });
     const blockedSet = new Set<string>();
-    for (const b of blocks) {
+    for (const b of blocks as { blockerId: string; blockedId: string }[]) {
       if (b.blockerId !== currentUserId) blockedSet.add(b.blockerId);
       if (b.blockedId !== currentUserId) blockedSet.add(b.blockedId);
     }
@@ -72,8 +72,8 @@ export default async function Home() {
         select: { postId: true },
       }),
     ]);
-    likedPostIds = new Set(likes.map((l) => l.postId));
-    bookmarkedPostIds = new Set(bookmarks.map((b) => b.postId));
+    likedPostIds = new Set(likes.map((l: any) => l.postId));
+    bookmarkedPostIds = new Set(bookmarks.map((b: any) => b.postId));
   }
 
   // Get current user info for the composer
@@ -143,7 +143,7 @@ export default async function Home() {
                 </p>
               </div>
             ) : (
-              posts.map((post) => (
+              posts.map((post: any) => (
                 <PostCard
                   key={post.id}
                   post={post}

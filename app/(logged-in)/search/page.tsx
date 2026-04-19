@@ -78,7 +78,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
   let likedPostIds = new Set<string>();
   let bookmarkedPostIds = new Set<string>();
   if (currentUserId && posts.length > 0) {
-    const ids = posts.map((p) => p.id);
+    const ids = posts.map((p: any) => p.id);
     const [likes, bookmarks] = await Promise.all([
       prisma.like.findMany({
         where: { userId: currentUserId, postId: { in: ids } },
@@ -89,8 +89,8 @@ export default async function SearchPage({ searchParams }: PageProps) {
         select: { postId: true },
       }),
     ]);
-    likedPostIds = new Set(likes.map((l) => l.postId));
-    bookmarkedPostIds = new Set(bookmarks.map((b) => b.postId));
+    likedPostIds = new Set(likes.map((l: any) => l.postId));
+    bookmarkedPostIds = new Set(bookmarks.map((b: any) => b.postId));
   }
 
   const hasResults = users.length > 0 || posts.length > 0;
@@ -129,7 +129,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
             People
           </h2>
           <div className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
-            {users.map((user) => {
+            {users.map((user: any) => {
               const displayName = user.name || user.username;
               return (
                 <Link
@@ -181,7 +181,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
             Posts
           </h2>
           <div className="space-y-4">
-            {posts.map((post) => (
+            {posts.map((post: any) => (
               <PostCard
                 key={post.id}
                 post={post}

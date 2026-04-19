@@ -132,15 +132,14 @@ export default async function Page({ params }: PageProps) {
         : null,
     ]);
 
-  const likedPostsList = likedPosts.map((l) => l.post);
+  const likedPostsList = likedPosts.map((l: any) => l.post);
   const savedPostsList = Array.isArray(savedPosts)
-    ? savedPosts.map((b) => b.post)
+    ? savedPosts.map((b: any) => b.post)
     : [];
 
-  // Collect all post IDs across tabs
-  const allPostIds = userPosts.map((p) => p.id);
-  const allLikedTabPostIds = likedPostsList.map((p) => p.id);
-  const allSavedTabPostIds = savedPostsList.map((p) => p.id);
+  const allPostIds = userPosts.map((p: any) => p.id);
+  const allLikedTabPostIds = likedPostsList.map((p: any) => p.id);
+  const allSavedTabPostIds = savedPostsList.map((p: any) => p.id);
   const allRelevantPostIds = [
     ...allPostIds,
     ...allLikedTabPostIds,
@@ -161,8 +160,8 @@ export default async function Page({ params }: PageProps) {
         select: { postId: true },
       }),
     ]);
-    currentUserLikedPostIds = likes.map((l) => l.postId);
-    currentUserBookmarkedPostIds = bookmarks.map((b) => b.postId);
+    currentUserLikedPostIds = likes.map((l: any) => l.postId);
+    currentUserBookmarkedPostIds = bookmarks.map((b: any) => b.postId);
   }
 
   const likedSet = new Set(currentUserLikedPostIds);
