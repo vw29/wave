@@ -9,8 +9,6 @@ interface PageProps {
   searchParams: Promise<{ q?: string }>;
 }
 
-
-
 interface SearchUser {
   id: string;
   username: string;
@@ -113,7 +111,9 @@ export default async function SearchPage({ searchParams }: PageProps) {
       }),
     ]);
     likedPostIds = new Set(likes.map((l: { postId: string }) => l.postId));
-    bookmarkedPostIds = new Set(bookmarks.map((b: { postId: string }) => b.postId));
+    bookmarkedPostIds = new Set(
+      bookmarks.map((b: { postId: string }) => b.postId),
+    );
   }
 
   const hasResults = users.length > 0 || posts.length > 0;
@@ -169,9 +169,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
                       className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                     />
                   ) : (
-                    <div
-                      className="w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center text-sm font-bold text-foreground flex-shrink-0"
-                    >
+                    <div className="w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center text-sm font-bold text-foreground flex-shrink-0">
                       {displayName.charAt(0).toUpperCase()}
                     </div>
                   )}
