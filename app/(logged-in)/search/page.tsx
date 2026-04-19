@@ -152,7 +152,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
             People
           </h2>
           <div className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
-            {users.map((user) => {
+            {users.map((user: SearchUser) => {
               const displayName = user.name || user.username;
               return (
                 <Link
@@ -202,7 +202,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
             Posts
           </h2>
           <div className="space-y-4">
-            {posts.map((post) => (
+            {posts.map((post: SearchPost) => (
               <PostCard
                 key={post.id}
                 post={post}
