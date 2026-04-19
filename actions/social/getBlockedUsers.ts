@@ -22,7 +22,7 @@ export async function getBlockedUsers() {
     },
   });
 
-  return blocks.map((b) => b.blocked);
+  return blocks.map((b: { blocked: { id: string; username: string; name: string | null; profileImage: string | null } }) => b.blocked);
 }
 
 export type BlockedUser = Awaited<ReturnType<typeof getBlockedUsers>>[number];
