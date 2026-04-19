@@ -4,7 +4,6 @@ import { auth } from "@/auth";
 import { editProfileSchema, type EditProfileSchema } from "@/lib/schemas";
 import { validateInput } from "@/lib/validation";
 import prisma from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function updateFullProfile(data: EditProfileSchema) {
@@ -34,11 +33,9 @@ export async function updateFullProfile(data: EditProfileSchema) {
     revalidatePath("/");
     revalidatePath(`/profile/${validated.data.username}`);
     return { success: true as const };
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
+  } catch (error: unknown) {
+    const err = error as { code?: string };
+    if (err?.code === "P2002") {
       return { success: false as const, message: "This username is already taken." };
     }
     return { success: false as const, message: "Something went wrong." };
