@@ -1,10 +1,26 @@
 import { auth } from "@/auth";
 import Link from "next/link";
-import LogoutButton from "@/components/LogoutButton";
+import UserDropdown from "@/components/feed/UserDropdown";
+import NotificationsDropdown from "@/components/feed/NotificationsDropdown";
+import SearchBar from "@/components/feed/SearchBar";
+import prisma from "@/lib/prisma";
+import { getNotifications } from "@/actions/notification/getNotifications";
 
 export default async function Navbar() {
   const session = await auth();
   const user = session?.user;
+
+  const dbUser = user?.id
+    ? await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { username: true, name: true, profileImage: true },
+      })
+    : null;
+
+  const profileHref = dbUser ? `/profile/${dbUser.username}` : "/settings";
+  const displayName = dbUser?.name || dbUser?.username || user?.email || "User";
+
+  const notifications = user?.id ? await getNotifications() : [];
 
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
@@ -17,59 +33,25 @@ export default async function Navbar() {
             </h1>
           </Link>
 
-          {/* Nav Links */}
-          <div className="hidden sm:flex items-center gap-1">
-            <Link
-              href="/"
-              className="px-4 py-2 text-foreground font-medium text-sm rounded-xl bg-muted transition-colors"
-            >
-              Home
-            </Link>
-            {user && (
-              <>
-                <Link
-                  href="/my-account"
-                  className="px-4 py-2 text-muted-foreground font-medium text-sm rounded-xl hover:text-foreground hover:bg-muted transition-colors"
-                >
-                  My Account
-                </Link>
-                <Link
-                  href="/change-password"
-                  className="px-4 py-2 text-muted-foreground font-medium text-sm rounded-xl hover:text-foreground hover:bg-muted transition-colors"
-                >
-                  Settings
-                </Link>
-              </>
-            )}
+          {/* Search Bar */}
+          <div className="hidden sm:block flex-1 max-w-md mx-8">
+            <SearchBar />
           </div>
 
           {/* Right Side */}
           <div className="flex items-center gap-3">
             {user ? (
               <>
-                <div className="relative p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all cursor-pointer">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.8}
-                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                    />
-                  </svg>
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full ring-2 ring-background"></span>
-                </div>
-                <Link
-                  href="/my-account"
-                  className="w-9 h-9 rounded-full bg-muted border border-border flex items-center justify-center text-sm font-bold text-foreground cursor-pointer hover:bg-accent transition-all"
-                >
-                  {user.email?.charAt(0).toUpperCase() ?? "U"}
-                </Link>
-                <LogoutButton />
+                <NotificationsDropdown
+                  notifications={notifications}
+                  currentUserId={user.id!}
+                />
+                <UserDropdown
+                  displayName={displayName}
+                  initial={user.email?.charAt(0).toUpperCase() ?? "U"}
+                  profileHref={profileHref}
+                  profileImage={dbUser?.profileImage}
+                />
               </>
             ) : (
               <Link

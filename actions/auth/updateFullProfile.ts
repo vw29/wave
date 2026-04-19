@@ -31,8 +31,8 @@ export async function updateFullProfile(data: EditProfileSchema) {
       },
     });
 
-    revalidatePath("/my-account");
     revalidatePath("/");
+    revalidatePath(`/profile/${validated.data.username}`);
     return { success: true as const };
   } catch (error) {
     if (

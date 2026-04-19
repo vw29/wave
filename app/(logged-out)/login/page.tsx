@@ -51,7 +51,7 @@ export default function Page() {
         form.setError("root", { message: result.message });
       } else {
         toast.success(TOAST_MESSAGES.loginSuccess);
-        router.push("/my-account");
+        router.push("/");
       }
     } catch {
       toast.error(ERROR_MESSAGES.generic);

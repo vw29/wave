@@ -26,5 +26,6 @@ export async function deletePost(postId: string) {
   await prisma.post.delete({ where: { id: postId } });
 
   revalidatePath("/");
+  revalidatePath(`/post/${postId}`);
   return { success: true };
 }

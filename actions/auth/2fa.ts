@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { generateSecret, generateURI, verify } from "otplib";
+import { revalidatePath } from "next/cache";
 
 async function requireAuth() {
   const session = await auth();
@@ -81,6 +82,7 @@ export async function verifyTwoFactorCode(token: string) {
     data: { twoFactorActivated: true },
   });
 
+  revalidatePath("/settings");
   return {
     success: true,
     message: "Two-factor authentication enabled successfully",
@@ -105,6 +107,7 @@ export async function disableTwoFactor() {
     data: { twoFactorActivated: false },
   });
 
+  revalidatePath("/settings");
   return {
     success: true,
     message: "Two-factor authentication disabled successfully",

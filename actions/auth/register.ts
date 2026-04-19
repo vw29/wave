@@ -3,9 +3,13 @@
 import { registerSchema, RegisterSchema } from "@/lib/schemas";
 import { validateInput } from "@/lib/validation";
 import { enforceRateLimit } from "@/lib/ratelimit";
-import { hashPassword } from "@/lib/password";
 import prisma from "@/lib/prisma";
+import { sendVerificationCode } from "./sendVerificationCode";
 
+/**
+ * Step 1: Validate registration data and send verification code.
+ * Does NOT create the user yet — that happens after email verification.
+ */
 export async function registerUser(data: RegisterSchema) {
   const validated = validateInput(registerSchema, data);
   if (!validated.success) return validated;
@@ -13,27 +17,26 @@ export async function registerUser(data: RegisterSchema) {
   const rateLimitError = await enforceRateLimit(data.email, "register");
   if (rateLimitError) return rateLimitError;
 
-  const passwordHash = await hashPassword(data.password);
+  // Check for existing email and username before proceeding
+  const [existingEmail, existingUsername] = await Promise.all([
+    prisma.user.findUnique({ where: { email: data.email }, select: { id: true } }),
+    prisma.user.findUnique({ where: { username: data.username }, select: { id: true } }),
+  ]);
 
-  try {
-    const user = await prisma.user.create({
-      data: {
-        email: data.email,
-        passwordHash,
-        username: data.username,
-      },
-    });
-
-    return { success: true as const, email: user.email };
-  } catch (error: unknown) {
-    const err = error as { code?: string; meta?: { target?: string[] } };
-    if (err?.code === "P2002") {
-      const target = err.meta?.target;
-      if (target?.includes("username")) {
-        return { success: false as const, message: "This username is already taken" };
-      }
-      return { success: false as const, message: "Email already exists" };
-    }
-    return { success: false as const, message: "Something went wrong" };
+  if (existingUsername) {
+    return { success: false as const, message: "This username is already taken" };
   }
+  if (existingEmail) {
+    return { success: false as const, message: "An account with this email already exists" };
+  }
+
+  // Send verification code to the email
+  try {
+    await sendVerificationCode(data.email, data.username);
+  } catch (err) {
+    console.error("[register] Failed to send verification email:", err);
+    return { success: false as const, message: "Failed to send verification email. Please try again." };
+  }
+
+  return { success: true as const, email: data.email };
 }

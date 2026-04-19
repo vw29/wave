@@ -3,8 +3,9 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { processMentions } from "@/lib/mentions";
 
-export async function createComment(postId: string, text: string) {
+export async function createComment(postId: string, text: string, parentId?: string) {
   const session = await auth();
   if (!session?.user?.id) {
     return { error: "You must be logged in to comment." };
@@ -23,11 +24,14 @@ export async function createComment(postId: string, text: string) {
       text: trimmed,
       authorId: session.user.id,
       postId,
+      parentId: parentId || null,
     },
     select: {
       id: true,
       text: true,
       createdAt: true,
+      updatedAt: true,
+      post: { select: { authorId: true } },
       author: {
         select: {
           id: true,
@@ -39,13 +43,56 @@ export async function createComment(postId: string, text: string) {
     },
   });
 
+  // Notify the post author (not yourself)
+  if (comment.post.authorId !== session.user.id) {
+    await prisma.notification.create({
+      data: {
+        type: "COMMENT",
+        senderId: session.user.id,
+        receiverId: comment.post.authorId,
+        postId,
+        commentId: comment.id,
+      },
+    });
+  }
+
+  // Notify the parent comment author if replying (and not yourself, and not already notified as post author)
+  if (parentId) {
+    const parentComment = await prisma.comment.findUnique({
+      where: { id: parentId },
+      select: { authorId: true },
+    });
+    if (
+      parentComment &&
+      parentComment.authorId !== session.user.id &&
+      parentComment.authorId !== comment.post.authorId
+    ) {
+      await prisma.notification.create({
+        data: {
+          type: "COMMENT",
+          senderId: session.user.id,
+          receiverId: parentComment.authorId,
+          postId,
+          commentId: comment.id,
+        },
+      });
+    }
+  }
+
+  await processMentions(trimmed, session.user.id, postId, comment.id);
+
   revalidatePath("/");
+  revalidatePath(`/post/${postId}`);
+  const { post: _post, ...commentData } = comment;
   return {
     success: true,
     comment: {
-      ...comment,
+      ...commentData,
+      parentId: parentId || null,
+      isPinned: false,
       likeCount: 0,
       likedByMe: false,
+      replies: [] as any[],
     },
   };
 }

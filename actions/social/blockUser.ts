@@ -38,6 +38,13 @@ export async function blockUser(targetUserId: string) {
     }),
   ]);
 
+  const [currentUser, targetUser] = await Promise.all([
+    prisma.user.findUnique({ where: { id: session.user.id }, select: { username: true } }),
+    prisma.user.findUnique({ where: { id: targetUserId }, select: { username: true } }),
+  ]);
+
   revalidatePath("/");
+  if (currentUser) revalidatePath(`/profile/${currentUser.username}`);
+  if (targetUser) revalidatePath(`/profile/${targetUser.username}`);
   return { success: true };
 }

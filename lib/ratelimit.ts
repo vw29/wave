@@ -7,7 +7,9 @@ type RateLimitAction =
   | "register"
   | "changePassword"
   | "forgotPassword"
-  | "resetPassword";
+  | "resetPassword"
+  | "verifyEmail"
+  | "verifyEmailCode";
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),

@@ -3,6 +3,7 @@
 import { profileSchema, type ProfileSchema } from "@/lib/schemas";
 import { validateInput } from "@/lib/validation";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function updateProfile(email: string, data: ProfileSchema) {
   const validated = validateInput(profileSchema, data);
@@ -22,6 +23,7 @@ export async function updateProfile(email: string, data: ProfileSchema) {
       },
     });
 
+    revalidatePath("/");
     return { success: true as const };
   } catch {
     return { success: false as const, message: "Something went wrong" };

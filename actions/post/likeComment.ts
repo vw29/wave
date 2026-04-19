@@ -10,6 +10,12 @@ export async function likeComment(commentId: string) {
     return { error: "You must be logged in to like a comment." };
   }
 
+  // Get the postId for revalidation
+  const comment = await prisma.comment.findUnique({
+    where: { id: commentId },
+    select: { postId: true },
+  });
+
   const existing = await prisma.commentLike.findUnique({
     where: {
       userId_commentId: {
@@ -29,14 +35,33 @@ export async function likeComment(commentId: string) {
       },
     });
   } else {
-    await prisma.commentLike.create({
+    const commentLike = await prisma.commentLike.create({
       data: {
         userId: session.user.id,
         commentId,
       },
+      select: {
+        comment: {
+          select: { authorId: true, postId: true },
+        },
+      },
     });
+
+    // Notify the comment author (not yourself)
+    if (commentLike.comment.authorId !== session.user.id) {
+      await prisma.notification.create({
+        data: {
+          type: "LIKE",
+          senderId: session.user.id,
+          receiverId: commentLike.comment.authorId,
+          postId: commentLike.comment.postId,
+          commentId,
+        },
+      });
+    }
   }
 
   revalidatePath("/");
+  if (comment) revalidatePath(`/post/${comment.postId}`);
   return { success: true };
 }

@@ -87,7 +87,12 @@ export default function TwoFactorAuthenticationForm({
             Scan this QR code with your authenticator app (e.g. Google
             Authenticator, Authy).
           </p>
-          <QRCodeSVG value={twoFactorSecret} className="size-40 mx-auto" />
+          <QRCodeSVG
+            value={twoFactorSecret}
+            className="size-40 mx-auto"
+            bgColor="transparent"
+            fgColor="#ffffff"
+          />
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setStep(1)}>
               Cancel

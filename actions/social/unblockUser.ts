@@ -17,6 +17,12 @@ export async function unblockUser(targetUserId: string) {
     },
   });
 
+  const targetUser = await prisma.user.findUnique({
+    where: { id: targetUserId },
+    select: { username: true },
+  });
+
   revalidatePath("/");
+  if (targetUser) revalidatePath(`/profile/${targetUser.username}`);
   return { success: true };
 }

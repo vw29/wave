@@ -6,11 +6,12 @@ interface SubmitButtonProps {
   disabled?: boolean;
   label: string;
   loadingLabel: string;
+  className?: string;
 }
 
-export function SubmitButton({ isSubmitting, disabled, label, loadingLabel }: SubmitButtonProps) {
+export function SubmitButton({ isSubmitting, disabled, label, loadingLabel, className }: SubmitButtonProps) {
   return (
-    <Button type="submit" disabled={isSubmitting || disabled}>
+    <Button type="submit" disabled={isSubmitting || disabled} className={className}>
       {isSubmitting ? (
         <>
           <Loader2 className="h-4 w-4 animate-spin" />

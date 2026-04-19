@@ -46,6 +46,23 @@ export async function followUser(targetUserId: string) {
     },
   });
 
+  // Notify the target user
+  await prisma.notification.create({
+    data: {
+      type: "FOLLOW",
+      senderId: session.user.id,
+      receiverId: targetUserId,
+    },
+  });
+
+  // Revalidate both users' profiles
+  const [currentUser, targetUser] = await Promise.all([
+    prisma.user.findUnique({ where: { id: session.user.id }, select: { username: true } }),
+    prisma.user.findUnique({ where: { id: targetUserId }, select: { username: true } }),
+  ]);
+
   revalidatePath("/");
+  if (currentUser) revalidatePath(`/profile/${currentUser.username}`);
+  if (targetUser) revalidatePath(`/profile/${targetUser.username}`);
   return { success: true };
 }

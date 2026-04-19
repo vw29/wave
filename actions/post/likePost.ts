@@ -29,14 +29,28 @@ export async function likePost(postId: string) {
       },
     });
   } else {
-    await prisma.like.create({
+    const like = await prisma.like.create({
       data: {
         userId: session.user.id,
         postId,
       },
+      select: { post: { select: { authorId: true } } },
     });
+
+    // Notify the post author (not yourself)
+    if (like.post.authorId !== session.user.id) {
+      await prisma.notification.create({
+        data: {
+          type: "LIKE",
+          senderId: session.user.id,
+          receiverId: like.post.authorId,
+          postId,
+        },
+      });
+    }
   }
 
   revalidatePath("/");
+  revalidatePath(`/post/${postId}`);
   return { success: true };
 }

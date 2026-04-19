@@ -13,8 +13,31 @@ export default async function Home() {
   const session = await auth();
   const currentUserId = session?.user?.id ?? null;
 
-  // Fetch posts with author info and counts
+  // Get blocked user IDs (both directions) to filter from feed
+  let blockedUserIds: string[] = [];
+  if (currentUserId) {
+    const blocks = await prisma.block.findMany({
+      where: {
+        OR: [
+          { blockerId: currentUserId },
+          { blockedId: currentUserId },
+        ],
+      },
+      select: { blockerId: true, blockedId: true },
+    });
+    const blockedSet = new Set<string>();
+    for (const b of blocks) {
+      if (b.blockerId !== currentUserId) blockedSet.add(b.blockerId);
+      if (b.blockedId !== currentUserId) blockedSet.add(b.blockedId);
+    }
+    blockedUserIds = [...blockedSet];
+  }
+
+  // Fetch posts with author info and counts (excluding blocked users)
   const posts = await prisma.post.findMany({
+    where: blockedUserIds.length > 0
+      ? { authorId: { notIn: blockedUserIds } }
+      : undefined,
     orderBy: { createdAt: "desc" },
     take: 50,
     include: {
@@ -35,14 +58,22 @@ export default async function Home() {
     },
   });
 
-  // If logged in, get which posts the user has liked
+  // If logged in, get which posts the user has liked and bookmarked
   let likedPostIds = new Set<string>();
+  let bookmarkedPostIds = new Set<string>();
   if (currentUserId) {
-    const likes = await prisma.like.findMany({
-      where: { userId: currentUserId },
-      select: { postId: true },
-    });
+    const [likes, bookmarks] = await Promise.all([
+      prisma.like.findMany({
+        where: { userId: currentUserId },
+        select: { postId: true },
+      }),
+      prisma.bookmark.findMany({
+        where: { userId: currentUserId },
+        select: { postId: true },
+      }),
+    ]);
     likedPostIds = new Set(likes.map((l) => l.postId));
+    bookmarkedPostIds = new Set(bookmarks.map((b) => b.postId));
   }
 
   // Get current user info for the composer
@@ -120,6 +151,7 @@ export default async function Home() {
                   currentUserName={currentUser?.name}
                   currentUserImage={currentUser?.profileImage}
                   initialLiked={likedPostIds.has(post.id)}
+                  initialBookmarked={bookmarkedPostIds.has(post.id)}
                 />
               ))
             )}

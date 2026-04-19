@@ -8,15 +8,12 @@ export default function AuthCTA() {
         {/* Logo */}
         <div className="text-center mb-5">
           <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-muted border border-border flex items-center justify-center shadow-lg">
-            <span className="text-lg font-extrabold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+            <span className="text-lg font-extrabold text-foreground">
               W
             </span>
           </div>
           <h2 className="text-lg font-bold text-foreground">
-            Welcome to{" "}
-            <span className="bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
-              Wave
-            </span>
+            Welcome to Wave
           </h2>
           <p className="text-muted-foreground text-xs mt-1">
             Join the conversation
@@ -27,7 +24,7 @@ export default function AuthCTA() {
         <div className="space-y-3">
           <Link
             href="/login"
-            className="block w-full text-center bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-600 hover:to-violet-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/25"
+            className="block w-full text-center bg-primary hover:bg-primary/80 text-primary-foreground font-semibold py-2.5 rounded-xl text-sm transition-colors duration-200"
           >
             Sign In
           </Link>

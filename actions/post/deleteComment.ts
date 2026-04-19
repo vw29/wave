@@ -12,7 +12,7 @@ export async function deleteComment(commentId: string) {
 
   const comment = await prisma.comment.findUnique({
     where: { id: commentId },
-    select: { authorId: true },
+    select: { authorId: true, postId: true },
   });
 
   if (!comment) {
@@ -26,5 +26,6 @@ export async function deleteComment(commentId: string) {
   await prisma.comment.delete({ where: { id: commentId } });
 
   revalidatePath("/");
+  revalidatePath(`/post/${comment.postId}`);
   return { success: true };
 }

@@ -5,6 +5,11 @@ interface PasswordResetEmailProps {
   resetUrl: string;
 }
 
+interface VerificationCodeEmailProps {
+  username: string;
+  code: string;
+}
+
 const colors = {
   bg: "#0a0a0a",
   card: "#141414",
@@ -85,6 +90,68 @@ export function PasswordResetEmail({
     </div>
 
     <!-- Footer -->
+    <p style="text-align:center;color:${colors.textMuted};font-size:11px;margin-top:24px;">
+      &copy; ${common.copyright(year)}
+    </p>
+
+  </body>
+</html>`;
+}
+
+export function VerificationCodeEmail({
+  username,
+  code,
+}: VerificationCodeEmailProps): string {
+  const year = new Date().getFullYear();
+  const { common } = EMAIL_TEXT;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify your email</title>
+  </head>
+  <body style="margin:0;padding:48px 16px;background-color:${colors.bg};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;">
+
+    <!-- Brand -->
+    <div style="text-align:center;margin-bottom:24px;">
+      <span style="font-size:22px;font-weight:700;color:${colors.textStrong};letter-spacing:-0.5px;">${common.brand}</span>
+    </div>
+
+    <!-- Card -->
+    <div style="background-color:${colors.card};border:1px solid ${colors.border};border-radius:12px;padding:40px 32px;max-width:440px;margin:0 auto;">
+
+      <h1 style="margin:0 0 8px;font-size:20px;font-weight:600;color:${colors.textStrong};text-align:center;line-height:1.4;">
+        Verify your email
+      </h1>
+
+      <p style="margin:0 0 28px;font-size:14px;color:${colors.text};text-align:center;line-height:1.7;">
+        Hi ${username}, enter the code below to verify your email address and complete your registration.
+      </p>
+
+      <!-- Code -->
+      <div style="text-align:center;margin-bottom:28px;">
+        <span style="display:inline-block;background-color:${colors.expiryBg};border:1px solid ${colors.expiryBorder};border-radius:8px;padding:16px 32px;font-size:32px;font-weight:700;letter-spacing:8px;color:${colors.textStrong};">
+          ${code}
+        </span>
+      </div>
+
+      <!-- Expiry -->
+      <div style="background-color:${colors.expiryBg};border:1px solid ${colors.expiryBorder};border-radius:8px;padding:10px 14px;text-align:center;margin-bottom:24px;">
+        <p style="margin:0;font-size:12px;color:${colors.textMuted};">
+          This code expires in 10 minutes.
+        </p>
+      </div>
+
+      <hr style="border:none;border-top:1px solid ${colors.border};margin:0 0 20px;" />
+
+      <p style="margin:0;font-size:12px;color:${colors.textMuted};text-align:center;line-height:1.6;">
+        If you didn't create an account on Wave, you can safely ignore this email.
+      </p>
+
+    </div>
+
     <p style="text-align:center;color:${colors.textMuted};font-size:11px;margin-top:24px;">
       &copy; ${common.copyright(year)}
     </p>

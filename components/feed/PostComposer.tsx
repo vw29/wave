@@ -114,7 +114,7 @@ export default function PostComposer({
         }
       }}
       className={`bg-card rounded-2xl border transition-colors duration-200 p-5 ${
-        isFocused ? "border-blue-500/30" : "border-border"
+        isFocused ? "border-primary/50" : "border-border"
       }`}
     >
       <div className="flex gap-3">
@@ -125,7 +125,7 @@ export default function PostComposer({
             className="w-10 h-10 rounded-full object-cover flex-shrink-0"
           />
         ) : (
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center text-sm font-bold text-foreground flex-shrink-0">
             {initial}
           </div>
         )}
@@ -145,10 +145,10 @@ export default function PostComposer({
           {(imageUrl || isUploading) && (
             <div className="mt-2 relative">
               {isUploading ? (
-                <div className="w-full h-48 rounded-xl border border-blue-500/30 bg-muted flex flex-col items-center justify-center gap-3 overflow-hidden relative">
+                <div className="w-full h-48 rounded-xl border border-primary/30 bg-muted flex flex-col items-center justify-center gap-3 overflow-hidden relative">
                   {/* Animated progress bar at top */}
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500/20">
-                    <div className="h-full bg-gradient-to-r from-blue-500 to-violet-500 animate-[indeterminate_1.5s_ease-in-out_infinite] w-1/3 rounded-full" />
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-primary/20">
+                    <div className="h-full bg-primary animate-[indeterminate_1.5s_ease-in-out_infinite] w-1/3 rounded-full" />
                   </div>
                   <svg
                     className="w-8 h-8 text-blue-400 animate-pulse"
@@ -320,7 +320,7 @@ export default function PostComposer({
               <button
                 onClick={handlePost}
                 disabled={(!content.trim() && !imageUrl) || isPending || isUploading}
-                className="bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-600 hover:to-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold px-6 py-2 rounded-xl text-sm transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                className="bg-primary hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed text-primary-foreground font-semibold px-6 py-2 rounded-xl text-sm transition-all duration-200"
               >
                 {isPending ? "Posting..." : "Post"}
               </button>

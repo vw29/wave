@@ -1,6 +1,60 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import Link from "next/link";
+import React from "react";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
+}
+
+export function formatCount(num: number) {
+  if (num >= 1000) return (num / 1000).toFixed(1) + "k";
+  return num.toString();
+}
+
+export function timeAgo(date: Date) {
+  const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+  if (seconds < 60) return "Just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(date).toLocaleDateString();
+}
+
+const GRADIENTS = [
+  "from-emerald-500 to-teal-600",
+  "from-orange-500 to-pink-600",
+  "from-cyan-500 to-blue-600",
+  "from-rose-500 to-red-600",
+  "from-amber-500 to-orange-600",
+  "from-indigo-500 to-purple-600",
+];
+
+export function getAvatarGradient(name: string) {
+  const index =
+    name.split("").reduce((a, c) => a + c.charCodeAt(0), 0) % GRADIENTS.length;
+  return GRADIENTS[index];
+}
+
+export function renderTextWithMentions(text: string) {
+  const parts = text.split(/(@[a-zA-Z0-9_]{3,20})/g);
+  return parts.map((part, i) => {
+    if (/^@[a-zA-Z0-9_]{3,20}$/.test(part)) {
+      const username = part.slice(1).toLowerCase();
+      return React.createElement(
+        Link,
+        {
+          key: i,
+          href: `/profile/${username}`,
+          className: "text-blue-400 hover:underline font-medium",
+          onClick: (e: React.MouseEvent) => e.stopPropagation(),
+        },
+        part,
+      );
+    }
+    return part;
+  });
 }
