@@ -112,8 +112,8 @@ export default async function SearchPage({ searchParams }: PageProps) {
         select: { postId: true },
       }),
     ]);
-    likedPostIds = new Set(likes.map((l) => l.postId));
-    bookmarkedPostIds = new Set(bookmarks.map((b) => b.postId));
+    likedPostIds = new Set(likes.map((l: { postId: string }) => l.postId));
+    bookmarkedPostIds = new Set(bookmarks.map((b: { postId: string }) => b.postId));
   }
 
   const hasResults = users.length > 0 || posts.length > 0;

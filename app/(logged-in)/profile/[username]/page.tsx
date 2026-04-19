@@ -146,9 +146,9 @@ export default async function Page({ params }: PageProps) {
         : null,
     ]);
 
-  const likedPostsList = likedPosts.map((l) => l.post);
+  const likedPostsList = likedPosts.map((l: { post: PostWithAuthor }) => l.post);
   const savedPostsList = Array.isArray(savedPosts)
-    ? savedPosts.map((b) => b.post)
+    ? (savedPosts as { post: PostWithAuthor }[]).map((b) => b.post)
     : [];
 
   const allPostIds = userPosts.map((p) => p.id);
@@ -174,8 +174,8 @@ export default async function Page({ params }: PageProps) {
         select: { postId: true },
       }),
     ]);
-    currentUserLikedPostIds = likes.map((l) => l.postId);
-    currentUserBookmarkedPostIds = bookmarks.map((b) => b.postId);
+    currentUserLikedPostIds = likes.map((l: { postId: string }) => l.postId);
+    currentUserBookmarkedPostIds = bookmarks.map((b: { postId: string }) => b.postId);
   }
 
   const likedSet = new Set(currentUserLikedPostIds);
